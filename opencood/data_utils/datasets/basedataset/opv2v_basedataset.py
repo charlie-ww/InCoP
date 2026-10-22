@@ -21,10 +21,14 @@ from opencood.data_utils.pre_processor import build_preprocessor
 from opencood.data_utils.post_processor import build_postprocessor
 
 class OPV2VBaseDataset(Dataset):
+    # OPV2V itself is released clean-pose only. Subclasses whose data does
+    # support perturbed poses (e.g. IsaacSim) set this to False.
+    clean_pose_only = True
+
     def __init__(self, params, visualize, train=True):
         forbidden = ("noise_setting", "wild_setting", "box_align")
         present = [key for key in forbidden if key in params]
-        if present:
+        if self.clean_pose_only and present:
             raise ValueError(
                 "OPV2V is clean-pose only; remove these settings: "
                 + ", ".join(present)

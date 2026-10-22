@@ -20,6 +20,10 @@ from opencood.utils.transformation_utils import x1_to_x2
 
 
 class IsaacSimBaseDataset(OPV2VBaseDataset):
+    # IsaacSim records both a perturbed lidar_pose and a lidar_pose_clean, so
+    # pose-noise evaluation is supported here even though OPV2V forbids it.
+    clean_pose_only = False
+
     # IsaacSim front camera uses OpenCV optical axes: x right, y down, z forward.
     # Converted lidar/BEV uses OpenCOOD axes: x forward, y left, z up. This
     # maps camera optical points (x right, y down, z forward) into lidar.
