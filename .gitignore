@@ -76,3 +76,8 @@ data/
 # Regenerable planning outputs (preserve only structure documentation)
 /IsaacSimGenScript/map/planning/trajectory/**
 !/IsaacSimGenScript/map/planning/trajectory/README.md
+
+# Sweep and training logs under runlogs/ are the evidence behind reported
+# numbers, so they are tracked despite the blanket *.log rule above.
+!runlogs/*.log
+!runlogs/**/*.log
