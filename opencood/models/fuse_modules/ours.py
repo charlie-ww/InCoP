@@ -295,6 +295,18 @@ class ComplementarityGuidedCLCFusion(CommunicationStatsMixin, nn.Module):
         if residual_output_init_gain <= 0.0:
             raise ValueError("residual_output_init_gain must be positive.")
         self.use_density_quality = bool(args.get("use_density_quality", True))
+        # Oracle alignment gating (experiment only). When set from outside to a
+        # tensor of shape [B], each scene's complementarity C is scaled by its
+        # entry before the attention bias log(C) is taken, so 0 fully masks the
+        # partner and 1 leaves fusion untouched.
+        self.oracle_weight = None
+        self.oracle_cell_gate = False
+        # Blur the partner BEV before fusion, to test whether the small-shift
+        # degradation is a matter of spatial sharpness. 0 disables it.
+        self.partner_blur_sigma = 0.0
+        # Oracle experiment: one blur sigma per scene, chosen from the true
+        # alignment error. Overrides partner_blur_sigma when set.
+        self.oracle_sigma = None
         self.use_complementarity_guidance = bool(
             args.get("use_complementarity_guidance", self.use_density_quality)
         )
@@ -452,12 +464,41 @@ class ComplementarityGuidedCLCFusion(CommunicationStatsMixin, nn.Module):
             dense_feature_elements,
         )
 
+    @staticmethod
+    def _gaussian_blur(x, sigma):
+        """Separable Gaussian blur over the BEV plane, applied per channel."""
+        radius = max(1, int(round(3.0 * sigma)))
+        coords = torch.arange(
+            -radius, radius + 1, device=x.device, dtype=x.dtype
+        )
+        kernel = torch.exp(-(coords ** 2) / (2.0 * sigma * sigma))
+        kernel = kernel / kernel.sum()
+        channels = x.shape[1]
+        kx = kernel.view(1, 1, 1, -1).expand(channels, 1, 1, -1)
+        ky = kernel.view(1, 1, -1, 1).expand(channels, 1, -1, 1)
+        x = F.conv2d(x, kx, padding=(0, radius), groups=channels)
+        x = F.conv2d(x, ky, padding=(radius, 0), groups=channels)
+        return x
+
+    @staticmethod
+    def _cell_agreement(noisy, clean, eps=1.0e-6):
+        """Per-cell cosine agreement between the misaligned and correct features.
+
+        1 where the misalignment left that cell's content intact, 0 where it
+        replaced it with something unrelated. Oracle only: it reads the clean
+        transform, which is ground truth.
+        """
+        dot = (noisy * clean).sum(dim=1, keepdim=True)
+        norm = noisy.norm(dim=1, keepdim=True) * clean.norm(dim=1, keepdim=True)
+        return (dot / norm.clamp_min(eps)).clamp(0.0, 1.0)
+
     def _fuse_scene(
         self,
         aligned_features,
         aligned_support,
         batch_idx,
         aligned_hard_mask=None,
+        cell_gate=None,
     ):
         if not self.use_density_quality:
             aligned_support = aligned_features.new_zeros(
@@ -484,6 +525,11 @@ class ComplementarityGuidedCLCFusion(CommunicationStatsMixin, nn.Module):
 
         partner_hard_mask = aligned_hard_mask[1:]
         partner_features = aligned_features[1:]
+        sigma = self.partner_blur_sigma
+        if self.oracle_sigma is not None:
+            sigma = float(self.oracle_sigma[batch_idx])
+        if sigma > 0.0:
+            partner_features = self._gaussian_blur(partner_features, sigma)
         ego_support = aligned_support[:1].clamp(0.0, 1.0)
         partner_support = aligned_support[1:].clamp(0.0, 1.0)
         # Q alone defines complementarity. A cell is complementary when the
@@ -495,6 +541,13 @@ class ComplementarityGuidedCLCFusion(CommunicationStatsMixin, nn.Module):
             if self.use_density_quality
             else partner_support.new_ones(partner_support.shape)
         ).clamp(0.0, 1.0)
+
+        if self.oracle_weight is not None:
+            complementarity = complementarity * self.oracle_weight[batch_idx].to(
+                complementarity.dtype
+            )
+        if cell_gate is not None:
+            complementarity = complementarity * cell_gate.to(complementarity.dtype)
 
         delta_local_window = self.local_window(
             ego_feature,
@@ -537,6 +590,7 @@ class ComplementarityGuidedCLCFusion(CommunicationStatsMixin, nn.Module):
         ego_alignment_matrix,
         support_mask=None,
         pairwise_pose_matrix=None,
+        clean_alignment_matrix=None,
         **legacy_kwargs,
     ):
         del pairwise_pose_matrix, legacy_kwargs
@@ -629,12 +683,28 @@ class ComplementarityGuidedCLCFusion(CommunicationStatsMixin, nn.Module):
                 # hard-filtered once before cooperative fusion and is not
                 # multiplied by M again here.
                 aligned_support = aligned_support * aligned_hard_mask
+            cell_gate = None
+            if self.oracle_cell_gate and clean_alignment_matrix is not None:
+                # Oracle: align the same partner features with the true transform
+                # as well, and keep only the cells where the misaligned copy still
+                # carries what the correct one does.
+                clean_aligned = self._align_scene(
+                    transmitted_features,
+                    clean_alignment_matrix,
+                    batch_idx,
+                    num_agents,
+                    (height, width),
+                )
+                cell_gate = self._cell_agreement(
+                    aligned_features[1:], clean_aligned[1:]
+                )
             fused_scenes.append(
                 self._fuse_scene(
                     aligned_features,
                     aligned_support,
                     batch_idx,
                     aligned_hard_mask=aligned_hard_mask,
+                    cell_gate=cell_gate,
                 )
             )
         self._record_communication(

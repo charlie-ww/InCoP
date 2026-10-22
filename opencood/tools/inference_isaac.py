@@ -2180,6 +2180,21 @@ def test_parser():
     parser.add_argument('--global_sort_detections', type=parse_bool_arg,
                         default=True, metavar='{true,false}',
                         help='whether to globally sort detections by confidence before AP calculation (default: true)')
+    parser.add_argument('--oracle_sigma_bins', type=str, default=None,
+                        help='Oracle experiment: pick the partner blur sigma per sample '
+                             'from the true alignment error. Format "limit:sigma,..." in '
+                             'ascending limit order, e.g. "0.16:0,0.27:1.0,inf:2.0".')
+    parser.add_argument('--partner_blur_sigma', type=float, default=0.0,
+                        help='Blur the partner BEV features by this Gaussian sigma (in '
+                             'BEV cells) before fusion. Tests whether small-shift damage '
+                             'is a matter of spatial sharpness.')
+    parser.add_argument('--oracle_cell_gate', action='store_true',
+                        help='Oracle experiment: weight each BEV cell by how well the '
+                             'misaligned partner feature still matches the correctly '
+                             'aligned one. Needs clean poses.')
+    parser.add_argument('--oracle_gate_threshold_m', type=float, default=None,
+                        help='Oracle experiment: drop the partner whenever the true '
+                             'alignment error exceeds this many metres. Needs clean poses.')
     parser.add_argument('--pose_noise_pos_std', type=float, default=0.0,
                         help='Gaussian pose translation noise std in meters, same convention as OPV2V/CoAlign')
     parser.add_argument('--pose_noise_rot_std', type=float, default=0.0,
@@ -3551,6 +3566,25 @@ def main():
     if torch.cuda.is_available():
         model.cuda()
     model.eval()
+    if getattr(opt, 'oracle_sigma_bins', None):
+        bins = []
+        for chunk in opt.oracle_sigma_bins.split(','):
+            limit, value = chunk.split(':')
+            bins.append((float(limit), float(value)))
+        model.oracle_sigma_bins = bins
+        print(f"Oracle per-sample blur sigma enabled: {bins}")
+    if getattr(opt, 'partner_blur_sigma', 0.0) > 0.0:
+        model.fusion_net.partner_blur_sigma = float(opt.partner_blur_sigma)
+        print(f"Partner BEV blur enabled: sigma={opt.partner_blur_sigma} cells")
+    if getattr(opt, 'oracle_cell_gate', False):
+        model.fusion_net.oracle_cell_gate = True
+        print("Oracle per-cell alignment gating enabled")
+    if opt.oracle_gate_threshold_m is not None:
+        model.oracle_gate_threshold_m = float(opt.oracle_gate_threshold_m)
+        print(
+            "Oracle alignment gating enabled: partner dropped above "
+            f"{opt.oracle_gate_threshold_m}m of true alignment error"
+        )
 
     # setting noise
     np.random.seed(303)

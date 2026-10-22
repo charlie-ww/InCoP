@@ -432,6 +432,51 @@ class HeterModelBevfusionHighresIsaac(nn.Module):
     def _fusion_accepts_pairwise(self):
         return isinstance(self.fusion_net, ComplementarityGuidedCLCFusion)
 
+    def _set_oracle_gate(self, noisy_pairwise, clean_pairwise, record_len):
+        """Oracle alignment gating, used only for the headroom experiment.
+
+        Reads the true residual transform between the noisy and the clean
+        ego-to-partner matrices, and hands the fusion module one weight per
+        scene: 0 when the translation error exceeds the threshold, 1 otherwise.
+        Disabled unless oracle_gate_threshold_m has been set from outside.
+        """
+        fusion = self.fusion_net
+        if not hasattr(fusion, "oracle_weight"):
+            return
+        threshold = getattr(self, "oracle_gate_threshold_m", None)
+        bins_cfg = getattr(self, "oracle_sigma_bins", None)
+        if (threshold is None and not bins_cfg) or noisy_pairwise is None or clean_pairwise is None:
+            fusion.oracle_weight = None
+            fusion.oracle_sigma = None
+            return
+
+        # pairwise_t_matrix[b, i, j] is the i -> j transform, so [b, 1, 0] maps
+        # the partner into the ego frame. The residual of the noisy transform
+        # against the clean one is the misalignment the fusion actually sees.
+        noisy = noisy_pairwise[:, 1, 0].to(torch.float32)
+        clean = clean_pairwise[:, 1, 0].to(torch.float32)
+        residual = torch.linalg.solve(clean, noisy)
+        error_m = torch.linalg.norm(residual[:, :2, 3], dim=-1)
+        self._last_oracle_error_m = error_m.detach()
+
+        bins = getattr(self, "oracle_sigma_bins", None)
+        if bins:
+            # bins is an ascending list of (error threshold in metres, sigma);
+            # the last entry's threshold is treated as unbounded.
+            sigma = torch.full_like(error_m, float(bins[-1][1]))
+            for limit, value in reversed(bins[:-1]):
+                sigma = torch.where(
+                    error_m <= float(limit), torch.full_like(sigma, float(value)), sigma
+                )
+            fusion.oracle_sigma = sigma
+        else:
+            fusion.oracle_sigma = None
+        fusion.oracle_weight = (
+            (error_m <= float(threshold)).to(torch.float32)
+            if threshold is not None
+            else None
+        )
+
     def _run_fusion(
         self, feature, record_len, affine_matrix, support_mask,
         pairwise_t_matrix, confidence_maps=None, fusion_context=None,
@@ -443,6 +488,7 @@ class HeterModelBevfusionHighresIsaac(nn.Module):
                 affine_matrix,
                 support_mask,
                 pairwise_t_matrix,
+                clean_alignment_matrix=getattr(self, "_clean_affine_matrix", None),
             )
         return run_standard_fusion(
             self.fusion_net,
@@ -723,6 +769,21 @@ class HeterModelBevfusionHighresIsaac(nn.Module):
             clean_pairwise_t_matrix = data_dict["label_dict"].get(
                 "pairwise_t_matrix_clean", None
             )
+
+        if getattr(self.fusion_net, "oracle_cell_gate", False):
+            self._clean_affine_matrix = (
+                normalize_pairwise_tfm_range(clean_pairwise_t_matrix, self.cav_range)
+                if clean_pairwise_t_matrix is not None
+                else None
+            )
+        else:
+            self._clean_affine_matrix = None
+
+        self._set_oracle_gate(
+            data_dict.get("pairwise_t_matrix", None),
+            clean_pairwise_t_matrix,
+            record_len,
+        )
 
         fusion_input_2d = self._apply_ego_feature_dropout(
             raw_feature_2d, record_len
