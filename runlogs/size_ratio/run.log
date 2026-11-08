@@ -1,0 +1,29 @@
+class                   n   width  length sqrt(area)   displacement that breaks IoU
+                              (m)     (m)        (m)      @0.3    @0.5    @0.7
+chair                 827    0.66    0.65       0.66      0.32    0.19    0.09
+fire_extinguisher     709    0.18    0.30       0.23      0.11    0.06    0.03
+medical_bag           786    0.82    0.55       0.67      0.32    0.19    0.09
+potted_plant         1190    0.87    0.93       0.90      0.43    0.25    0.13
+traffic_cone          788    0.34    0.33       0.33      0.16    0.09    0.05
+trash_can             832    0.25    0.25       0.25      0.12    0.07    0.04
+wet_floor_sign        653    0.27    0.23       0.25      0.12    0.07    0.04
+
+MEDIAN CLASS                 0.34    0.33       0.33      0.16    0.09    0.05
+
+=== indoor objects vs the misalignment they actually get ===
+  sigma_pos=0.2, near robot    = 0.43 m  ->  ratio to median object 1.28x, breaks IoU@0.3 for 6/7 classes
+  sigma_pos=0.2, range edge    = 1.26 m  ->  ratio to median object 3.76x, breaks IoU@0.3 for 7/7 classes
+
+=== outdoor reference (typical cooperative-perception benchmark) ===
+  car 1.8 x 4.5 m: breaks IoU@0.3 at 1.23 m displacement
+    benchmark pose noise 0.2 m -> ratio to object 0.070x, SAFE (16% of the breaking distance)
+    benchmark pose noise 0.5 m -> ratio to object 0.176x, SAFE (41% of the breaking distance)
+
+  indoor median object: 0.43 m actual misalignment is 267% of its breaking distance; 1.26 m is 782%.
+
+=== why coarsening cannot rescue it ===
+  To tolerate a 1.26 m shift you must blur to roughly that scale.
+  The median indoor object is 0.33 m across, i.e. 0.27x the blur scale - it is erased.
+  A 1.8x4.5 m car is 5.7x the 0.5 m blur scale an outdoor method needs - it survives.
+
+wrote /nfs/home/charlie/InCoP/runlogs/size_ratio/size_ratio.json

@@ -1,0 +1,23 @@
+low: 2440 frames
+high: 1501 frames
+
+wrote /tmp/claude-2058/-nfs-home-charlie/f075164b-ef86-4fa7-bf81-3387ab7b5719/scratchpad/perframe_overlap.csv
+
+=== low overlap  (2440 frames) ===
+  shared objects/frame:       median 2  mean 2.69  p10 0  p90 6
+    frames with <=0 shared:  26.0%
+    frames with <=1 shared:  39.5%
+    frames with <=2 shared:  53.3%
+    frames with <=3 shared:  66.6%
+  partner-only objects/frame: median 1  mean 1.92   frames with >=1: 65.0%
+  robot distance (m):   median 8.04  p10 6.42  p90 14.28
+  |heading diff| (deg): median 29.2  p10 3.1  p90 127.7
+=== high overlap  (1501 frames) ===
+  shared objects/frame:       median 6  mean 6.19  p10 2  p90 10
+    frames with <=0 shared:   1.1%
+    frames with <=1 shared:   5.4%
+    frames with <=2 shared:  10.9%
+    frames with <=3 shared:  23.3%
+  partner-only objects/frame: median 0  mean 0.72   frames with >=1: 45.4%
+  robot distance (m):   median 1.00  p10 1.00  p90 1.60
+  |heading diff| (deg): median 0.0  p10 0.0  p90 0.2
