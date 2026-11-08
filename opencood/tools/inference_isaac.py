@@ -20,6 +20,18 @@ from opencood.data_utils.datasets import build_dataset
 from opencood.utils import eval_utils
 from opencood.utils import eval_utils_isaac
 from opencood.utils import pcd_utils
+from opencood.utils.freespace_uncertainty import (
+    FreeSpaceContradiction,
+    parse_bins as parse_freespace_bins,
+    sigma_from_score,
+)
+from opencood.utils.pose_sensitivity import (
+    SensitivityProbe,
+    draw_perturbations,
+    frame_quality,
+    perturb_pairwise,
+    true_alignment_error,
+)
 from opencood.visualization import simple_vis_isaac
 from opencood.utils.common_utils import update_dict
 from opencood.utils import box_utils, common_utils
@@ -2180,6 +2192,30 @@ def test_parser():
     parser.add_argument('--global_sort_detections', type=parse_bool_arg,
                         default=True, metavar='{true,false}',
                         help='whether to globally sort detections by confidence before AP calculation (default: true)')
+    parser.add_argument('--estimated_sigma_bins', type=str, default=None,
+                        help='Pick the partner blur sigma per sample from the '
+                             'free-space contradiction score instead of from '
+                             'the true error. Same format as '
+                             '--oracle_sigma_bins but the limits are scores in '
+                             '[0,1], e.g. "0.429:0,0.600:1.0,inf:2.0".')
+    parser.add_argument('--estimated_sigma_fallback', type=float, default=2.0,
+                        help='Blur sigma used when the partner lands nowhere '
+                             'the ego can judge, which happens in roughly 15%% '
+                             'of draws on the hospital split.')
+    parser.add_argument('--sensitivity_probe', type=int, default=0,
+                        help='run the partner pose K times per sample, drawn '
+                             'from the localisation prior, and record how much '
+                             'the detections move. Needs no ground truth. 0 '
+                             'disables; 8 is a reasonable probe.')
+    parser.add_argument('--sensitivity_prior_pos', type=float, default=None,
+                        help='translation std of the prior the probe samples, '
+                             'in metres. Defaults to the injected '
+                             '--pose_noise_pos_std.')
+    parser.add_argument('--sensitivity_prior_rot', type=float, default=None,
+                        help='rotation std of the prior the probe samples, in '
+                             'degrees. Defaults to --pose_noise_rot_std.')
+    parser.add_argument('--sensitivity_csv', type=str, default='',
+                        help='where to write the per-sample probe record.')
     parser.add_argument('--oracle_sigma_bins', type=str, default=None,
                         help='Oracle experiment: pick the partner blur sigma per sample '
                              'from the true alignment error. Format "limit:sigma,..." in '
@@ -2847,6 +2883,33 @@ def _vis_sample_info(opencood_dataset, expanded_idx):
         "sample_idx": int(expanded_idx),
         "ego_cav_id": None,
     }
+
+
+def _freespace_sample_sigma(estimator, bins, fallback, opencood_dataset, idx,
+                            pairwise_t_matrix, log):
+    """Blur sigma for this sample, from the free-space contradiction score."""
+    if pairwise_t_matrix is None:
+        return float(fallback)
+    records = _get_opv2v_sample_records(opencood_dataset, idx)
+    cav_ids = _sorted_cav_ids(records)
+    if len(cav_ids) < 2:
+        return float(fallback)
+    ego_cav_id = _vis_sample_info(opencood_dataset, idx).get("ego_cav_id")
+    if ego_cav_id not in records:
+        ego_cav_id = {str(c): c for c in cav_ids}.get(str(ego_cav_id), cav_ids[0])
+    partner_cav_id = next(c for c in cav_ids if c != ego_cav_id)
+    ego_pcd = records[ego_cav_id].get("lidar")
+    partner_pcd = records[partner_cav_id].get("lidar")
+    if not ego_pcd or not partner_pcd:
+        return float(fallback)
+
+    # pairwise_t_matrix[b, i, j] maps i into j, so [0, 1, 0] brings the partner
+    # into the ego frame under the pose the model believes, not the true one.
+    transform = pairwise_t_matrix[0, 1, 0].detach().cpu().numpy()
+    score, judgeable = estimator.score(ego_pcd, partner_pcd, transform)
+    sigma = sigma_from_score(score, bins, fallback)
+    log.append((float(score), int(judgeable), float(sigma)))
+    return sigma
 
 
 def _cav_id_to_path_tag(cav_id):
@@ -3576,6 +3639,49 @@ def main():
     if getattr(opt, 'partner_blur_sigma', 0.0) > 0.0:
         model.fusion_net.partner_blur_sigma = float(opt.partner_blur_sigma)
         print(f"Partner BEV blur enabled: sigma={opt.partner_blur_sigma} cells")
+    freespace_estimator = None
+    estimated_sigma_bins = None
+    estimated_sigma_log = []
+    if getattr(opt, 'estimated_sigma_bins', None):
+        estimated_sigma_bins = parse_freespace_bins(opt.estimated_sigma_bins)
+        freespace_estimator = FreeSpaceContradiction(
+            hypes["postprocess"]["gt_range"]
+        )
+        print(
+            "Estimated per-sample blur sigma enabled: "
+            f"{estimated_sigma_bins}, fallback {opt.estimated_sigma_fallback}"
+        )
+    sensitivity_probe = None
+    sensitivity_perturbations = None
+    sensitivity_log = []
+    if getattr(opt, 'sensitivity_probe', 0) and opt.sensitivity_probe > 1:
+        prior_pos = (
+            opt.sensitivity_prior_pos
+            if opt.sensitivity_prior_pos is not None
+            else opt.pose_noise_pos_std
+        )
+        prior_rot = (
+            opt.sensitivity_prior_rot
+            if opt.sensitivity_prior_rot is not None
+            else opt.pose_noise_rot_std
+        )
+        if prior_pos <= 0.0 and prior_rot <= 0.0:
+            print(
+                "Pose-sensitivity probe skipped: the prior has zero width, so "
+                "every perturbation is the identity."
+            )
+        else:
+            sensitivity_probe = SensitivityProbe(hypes["postprocess"]["gt_range"])
+            sensitivity_perturbations = draw_perturbations(
+                int(opt.sensitivity_probe), prior_pos, prior_rot,
+                np.random.default_rng(1234),
+            )
+            print(
+                f"Pose-sensitivity probe enabled: {len(sensitivity_perturbations)}"
+                f" draws per sample, prior pos_std={prior_pos}, "
+                f"rot_std={prior_rot}"
+            )
+
     if getattr(opt, 'oracle_cell_gate', False):
         model.fusion_net.oracle_cell_gate = True
         print("Oracle per-cell alignment gating enabled")
@@ -3894,10 +4000,90 @@ def main():
             timing["to_device"] += time.perf_counter() - stage_time
 
             stage_time = time.perf_counter()
+            if freespace_estimator is not None:
+                model.fusion_net.partner_blur_sigma = _freespace_sample_sigma(
+                    freespace_estimator,
+                    estimated_sigma_bins,
+                    opt.estimated_sigma_fallback,
+                    opencood_dataset,
+                    i,
+                    batch_data.get('ego', {}).get('pairwise_t_matrix'),
+                    estimated_sigma_log,
+                )
             setattr(model, "save_feature_debug", save_feature_vis)
             infer_result = inference_isaac_center_head(
                 batch_data, model, hypes["postprocess"], opt.fusion_method
             )
+
+            if sensitivity_probe is not None:
+                _ego = batch_data.get('ego', {})
+                _base = _ego.get('pairwise_t_matrix')
+                _runs = [(
+                    infer_result.get('pred_box_tensor'),
+                    infer_result.get('pred_score'),
+                )]
+                if _base is not None:
+                    setattr(model, "save_feature_debug", False)
+                    for _dx, _dy, _dyaw in sensitivity_perturbations[1:]:
+                        _ego['pairwise_t_matrix'] = perturb_pairwise(
+                            _base, _dx, _dy, _dyaw
+                        )
+                        _alt = inference_isaac_center_head(
+                            batch_data, model, hypes["postprocess"],
+                            opt.fusion_method,
+                        )
+                        _runs.append((
+                            _alt.get('pred_box_tensor'), _alt.get('pred_score')
+                        ))
+                    # The frame's own ceiling: what this sample would have
+                    # scored had the pose been right. One extra pass, and it
+                    # turns the probe into a test of predicted damage rather
+                    # than of predicted error.
+                    _clean = _ego.get('pairwise_t_matrix_clean')
+                    _q_clean = None
+                    if _clean is not None:
+                        _ego['pairwise_t_matrix'] = _clean.clone()
+                        _ref = inference_isaac_center_head(
+                            batch_data, model, hypes["postprocess"],
+                            opt.fusion_method,
+                        )
+                        _q_clean = frame_quality(
+                            _ref.get('pred_box_tensor'),
+                            _ref.get('pred_score'),
+                            _ref.get('gt_box_tensor'),
+                        )
+                    _ego['pairwise_t_matrix'] = _base
+                _stat = sensitivity_probe.score(_runs)
+                _q_noisy = frame_quality(
+                    infer_result.get('pred_box_tensor'),
+                    infer_result.get('pred_score'),
+                    infer_result.get('gt_box_tensor'),
+                )
+                _stat['recall_noisy'] = _q_noisy['recall']
+                _stat['n_gt'] = _q_noisy['n_gt']
+                _stat['recall_clean'] = (
+                    _q_clean['recall'] if _q_clean else float('nan')
+                )
+                _stat['damage'] = (
+                    _q_clean['recall'] - _q_noisy['recall']
+                    if _q_clean else float('nan')
+                )
+                _stat['true_error_m'] = true_alignment_error(
+                    _base, _ego.get('pairwise_t_matrix_clean')
+                )
+                _stat['sample'] = i
+                # The free-space score for the same sample, when that estimator
+                # is also running. The two are meant to measure different
+                # things: free space estimates how wrong the pose is, the probe
+                # estimates how much being wrong would matter here.
+                _stat['freespace_score'] = (
+                    estimated_sigma_log[-1][0] if estimated_sigma_log
+                    else float('nan')
+                )
+                _stat['freespace_judgeable'] = (
+                    estimated_sigma_log[-1][1] if estimated_sigma_log else 0
+                )
+                sensitivity_log.append(_stat)
 
             video_ego_infer_result = None
             if video_ego_batch_data is not None:
@@ -4144,6 +4330,81 @@ def main():
 
     if torch.cuda.is_available():
         torch.cuda.empty_cache()
+
+    if estimated_sigma_log:
+        scores = np.array([s for s, _, _ in estimated_sigma_log])
+        sigmas = np.array([g for _, _, g in estimated_sigma_log])
+        no_evidence = int(np.isnan(scores).sum())
+        print(
+            f"Free-space estimator: {len(scores)} samples, "
+            f"no evidence in {no_evidence} "
+            f"({100.0 * no_evidence / len(scores):.1f}%), "
+            f"score median {np.nanmedian(scores):.3f}, "
+            f"mean sigma {sigmas.mean():.3f}"
+        )
+        for value in sorted(set(sigmas.tolist())):
+            share = 100.0 * float((sigmas == value).mean())
+            print(f"  sigma={value:.2f} chosen for {share:.1f}% of samples")
+
+    if sensitivity_log:
+        import csv as _csv
+        _keys = ["sample", "true_error_m", "damage", "recall_clean",
+                 "recall_noisy", "n_gt", "map_std", "jitter_m", "n_mean",
+                 "n_std", "n_cv", "cells_touched", "freespace_score",
+                 "freespace_judgeable"]
+        _path = opt.sensitivity_csv or os.path.join(
+            opt.model_dir, f"sensitivity_{infer_info}.csv"
+        )
+        os.makedirs(os.path.dirname(os.path.abspath(_path)), exist_ok=True)
+        with open(_path, "w", newline="") as _fh:
+            _w = _csv.DictWriter(_fh, fieldnames=_keys, extrasaction="ignore")
+            _w.writeheader()
+            for _row in sensitivity_log:
+                _w.writerow(_row)
+        _ms = np.array([r["map_std"] for r in sensitivity_log])
+        _te = np.array([r["true_error_m"] for r in sensitivity_log])
+        _ok = np.isfinite(_ms) & np.isfinite(_te)
+        print(
+            f"Pose-sensitivity probe: {len(sensitivity_log)} samples, "
+            f"map_std median {np.nanmedian(_ms):.4f} "
+            f"[p10 {np.nanpercentile(_ms, 10):.4f}, "
+            f"p90 {np.nanpercentile(_ms, 90):.4f}]"
+        )
+        _dm = np.array([r.get("damage", float("nan")) for r in sensitivity_log])
+        _jt = np.array([r.get("jitter_m", float("nan")) for r in sensitivity_log])
+        if _ok.sum() > 8:
+            from scipy import stats as _st
+
+            def _rho(a, b, label):
+                m = np.isfinite(a) & np.isfinite(b)
+                if m.sum() < 9:
+                    print(f"  {label}: too few samples ({int(m.sum())})")
+                    return
+                print(f"  {label}: rho {_st.spearmanr(a[m], b[m]).statistic:+.3f} "
+                      f"(n={int(m.sum())})")
+
+            print("  what the probe predicts:")
+            _rho(_jt, _dm, "jitter_m   vs per-frame damage    ")
+            _rho(_ms, _dm, "map_std    vs per-frame damage    ")
+            _rho(_jt, _te, "jitter_m   vs true error          ")
+            _rho(_jt * np.where(np.isfinite(_te), _te, np.nan), _dm,
+                 "jitter x error vs damage         ")
+            _fs = np.array(
+                [r.get("freespace_score", float("nan")) for r in sensitivity_log]
+            )
+            if np.isfinite(_fs).sum() > 8:
+                print("  the two estimators together (no ground truth used):")
+                _rho(_fs, _dm, "freespace        vs damage       ")
+                _rho(_fs, _te, "freespace        vs true error   ")
+                _rho(_fs, _jt, "freespace        vs jitter       ")
+                _rho(_fs * _jt, _dm, "freespace x jitter vs damage   ")
+            _fd = np.isfinite(_dm)
+            if _fd.sum():
+                print(f"  damage: median {np.nanmedian(_dm):+.3f} recall, "
+                      f"mean {np.nanmean(_dm):+.3f}, "
+                      f"frames hurt {100.0 * (_dm[_fd] > 0).mean():.0f}%, "
+                      f"helped {100.0 * (_dm[_fd] < 0).mean():.0f}%")
+        print(f"  wrote {_path}")
 
     if stream_video_writer is not None:
         stream_video_writer.close()
