@@ -1,0 +1,77 @@
+=== pos_std=0.10 rot_std=1.0 -> runlogs/sensitivity/probe_0.10.log
+    exit=0
+    Pose-sensitivity probe: 400 samples, map_std median 0.1692 [p10 0.0733, p90 0.2230]
+      what the probe predicts:
+      jitter_m   vs per-frame damage    : rho +0.210 (n=399)
+      map_std    vs per-frame damage    : rho +0.053 (n=400)
+      jitter_m   vs true error          : rho -0.055 (n=399)
+      jitter x error vs damage         : rho +0.364 (n=399)
+      the two estimators together (no ground truth used):
+      freespace        vs damage       : rho +0.211 (n=400)
+      freespace        vs true error   : rho +0.239 (n=400)
+      freespace        vs jitter       : rho +0.058 (n=399)
+      freespace x jitter vs damage   : rho +0.264 (n=399)
+      damage: median +0.000 recall, mean +0.038, frames hurt 30%, helped 11%
+      wrote runlogs/sensitivity/probe_0.10.csv
+    Isaac multi-class mAP: mAP@0.3=0.2525, mAP@0.5=0.1390, mAP@0.7=0.0190
+    False-positive summary: FPPI@0.5=3.980, Precision@0.5=0.333
+    Indoor class-wise localization: mATE@0.5m=0.17584041612488882, mASE@0.5m=0.1093699149787426
+    Isaac distance case mAP: mAP@0.3=0.2525, mAP@0.5=0.1390, mAP@0.7=0.0190
+=== pos_std=0.20 rot_std=2.0 -> runlogs/sensitivity/probe_0.20.log
+    exit=0
+    Pose-sensitivity probe: 400 samples, map_std median 0.1677 [p10 0.0754, p90 0.2109]
+      what the probe predicts:
+      jitter_m   vs per-frame damage    : rho +0.321 (n=400)
+      map_std    vs per-frame damage    : rho +0.187 (n=400)
+      jitter_m   vs true error          : rho -0.008 (n=400)
+      jitter x error vs damage         : rho +0.555 (n=400)
+      the two estimators together (no ground truth used):
+      freespace        vs damage       : rho +0.381 (n=400)
+      freespace        vs true error   : rho +0.383 (n=400)
+      freespace        vs jitter       : rho +0.058 (n=400)
+      freespace x jitter vs damage   : rho +0.451 (n=400)
+      damage: median +0.118 recall, mean +0.128, frames hurt 58%, helped 6%
+      wrote runlogs/sensitivity/probe_0.20.csv
+    Isaac multi-class mAP: mAP@0.3=0.1724, mAP@0.5=0.0963, mAP@0.7=0.0133
+    False-positive summary: FPPI@0.5=4.360, Precision@0.5=0.271
+    Indoor class-wise localization: mATE@0.5m=0.17871240845748357, mASE@0.5m=0.11529074981808662
+    Isaac distance case mAP: mAP@0.3=0.1724, mAP@0.5=0.0963, mAP@0.7=0.0133
+=== pos_std=0.40 rot_std=4.0 -> runlogs/sensitivity/probe_0.40.log
+    exit=0
+    Pose-sensitivity probe: 400 samples, map_std median 0.1665 [p10 0.0982, p90 0.2059]
+      what the probe predicts:
+      jitter_m   vs per-frame damage    : rho +0.313 (n=399)
+      map_std    vs per-frame damage    : rho +0.280 (n=400)
+      jitter_m   vs true error          : rho +0.002 (n=399)
+      jitter x error vs damage         : rho +0.425 (n=399)
+      the two estimators together (no ground truth used):
+      freespace        vs damage       : rho +0.335 (n=394)
+      freespace        vs true error   : rho +0.386 (n=394)
+      freespace        vs jitter       : rho +0.107 (n=393)
+      freespace x jitter vs damage   : rho +0.381 (n=393)
+      damage: median +0.182 recall, mean +0.193, frames hurt 77%, helped 3%
+      wrote runlogs/sensitivity/probe_0.40.csv
+    Isaac multi-class mAP: mAP@0.3=0.1414, mAP@0.5=0.0844, mAP@0.7=0.0119
+    False-positive summary: FPPI@0.5=4.530, Precision@0.5=0.253
+    Indoor class-wise localization: mATE@0.5m=0.14555626894746507, mASE@0.5m=0.12118950273309435
+    Isaac distance case mAP: mAP@0.3=0.1414, mAP@0.5=0.0844, mAP@0.7=0.0119
+=== pos_std=0.80 rot_std=8.0 -> runlogs/sensitivity/probe_0.80.log
+    exit=0
+    Pose-sensitivity probe: 400 samples, map_std median 0.1649 [p10 0.1011, p90 0.2055]
+      what the probe predicts:
+      jitter_m   vs per-frame damage    : rho +0.501 (n=400)
+      map_std    vs per-frame damage    : rho +0.303 (n=400)
+      jitter_m   vs true error          : rho -0.081 (n=400)
+      jitter x error vs damage         : rho +0.340 (n=400)
+      the two estimators together (no ground truth used):
+      freespace        vs damage       : rho +0.168 (n=384)
+      freespace        vs true error   : rho +0.295 (n=384)
+      freespace        vs jitter       : rho +0.024 (n=384)
+      freespace x jitter vs damage   : rho +0.505 (n=384)
+      damage: median +0.218 recall, mean +0.206, frames hurt 80%, helped 2%
+      wrote runlogs/sensitivity/probe_0.80.csv
+    Isaac multi-class mAP: mAP@0.3=0.1289, mAP@0.5=0.0799, mAP@0.7=0.0130
+    False-positive summary: FPPI@0.5=4.865, Precision@0.5=0.247
+    Indoor class-wise localization: mATE@0.5m=0.1286061948963574, mASE@0.5m=0.1234233658760786
+    Isaac distance case mAP: mAP@0.3=0.1289, mAP@0.5=0.0799, mAP@0.7=0.0130
+ALL DONE

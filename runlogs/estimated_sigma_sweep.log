@@ -1,0 +1,51 @@
+=== none  pos_std=0.10 rot_std=1.0  -> runlogs/estimated_sigma/none_0.10.log
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.2693, mAP@0.5=0.1385, mAP@0.7=0.0212
+=== fixed1  pos_std=0.10 rot_std=1.0  -> runlogs/estimated_sigma/fixed1_0.10.log
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.2810, mAP@0.5=0.1589, mAP@0.7=0.0256
+=== fixed2  pos_std=0.10 rot_std=1.0  -> runlogs/estimated_sigma/fixed2_0.10.log
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.2665, mAP@0.5=0.1596, mAP@0.7=0.0287
+=== oracle  pos_std=0.10 rot_std=1.0  -> runlogs/estimated_sigma/oracle_0.10.log
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.2906, mAP@0.5=0.1647, mAP@0.7=0.0280
+=== estimated  pos_std=0.10 rot_std=1.0  -> runlogs/estimated_sigma/estimated_0.10.log
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.2791, mAP@0.5=0.1597, mAP@0.7=0.0262
+=== none  pos_std=0.20 rot_std=2.0  -> runlogs/estimated_sigma/none_0.20.log
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.1918, mAP@0.5=0.1025, mAP@0.7=0.0168
+=== fixed1  pos_std=0.20 rot_std=2.0  -> runlogs/estimated_sigma/fixed1_0.20.log
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.2368, mAP@0.5=0.1367, mAP@0.7=0.0242
+=== fixed2  pos_std=0.20 rot_std=2.0  -> runlogs/estimated_sigma/fixed2_0.20.log
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.2506, mAP@0.5=0.1523, mAP@0.7=0.0275
+=== oracle  pos_std=0.20 rot_std=2.0  -> runlogs/estimated_sigma/oracle_0.20.log
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.2505, mAP@0.5=0.1481, mAP@0.7=0.0251
+=== estimated  pos_std=0.20 rot_std=2.0  -> runlogs/estimated_sigma/estimated_0.20.log
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.2436, mAP@0.5=0.1433, mAP@0.7=0.0257
+=== none  pos_std=0.30 rot_std=3.0  -> runlogs/estimated_sigma/none_0.30.log
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.1656, mAP@0.5=0.0939, mAP@0.7=0.0166
+=== fixed1  pos_std=0.30 rot_std=3.0  -> runlogs/estimated_sigma/fixed1_0.30.log
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.2131, mAP@0.5=0.1246, mAP@0.7=0.0227
+=== fixed2  pos_std=0.30 rot_std=3.0  -> runlogs/estimated_sigma/fixed2_0.30.log
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.2407, mAP@0.5=0.1463, mAP@0.7=0.0272
+=== oracle  pos_std=0.30 rot_std=3.0  -> runlogs/estimated_sigma/oracle_0.30.log
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.2419, mAP@0.5=0.1443, mAP@0.7=0.0264
+=== estimated  pos_std=0.30 rot_std=3.0  -> runlogs/estimated_sigma/estimated_0.30.log
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.2337, mAP@0.5=0.1400, mAP@0.7=0.0253
+=== none  pos_std=0.60 rot_std=6.0  -> runlogs/estimated_sigma/none_0.60.log
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.1438, mAP@0.5=0.0844, mAP@0.7=0.0150
+=== fixed1  pos_std=0.60 rot_std=6.0  -> runlogs/estimated_sigma/fixed1_0.60.log
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.1987, mAP@0.5=0.1217, mAP@0.7=0.0230
+=== fixed2  pos_std=0.60 rot_std=6.0  -> runlogs/estimated_sigma/fixed2_0.60.log
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.2309, mAP@0.5=0.1423, mAP@0.7=0.0267
+=== oracle  pos_std=0.60 rot_std=6.0  -> runlogs/estimated_sigma/oracle_0.60.log
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.2304, mAP@0.5=0.1411, mAP@0.7=0.0263
+=== estimated  pos_std=0.60 rot_std=6.0  -> runlogs/estimated_sigma/estimated_0.60.log
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.2245, mAP@0.5=0.1364, mAP@0.7=0.0251
+=== none  pos_std=0.80 rot_std=8.0  -> runlogs/estimated_sigma/none_0.80.log
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.1427, mAP@0.5=0.0860, mAP@0.7=0.0158
+=== fixed1  pos_std=0.80 rot_std=8.0  -> runlogs/estimated_sigma/fixed1_0.80.log
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.1949, mAP@0.5=0.1203, mAP@0.7=0.0228
+=== fixed2  pos_std=0.80 rot_std=8.0  -> runlogs/estimated_sigma/fixed2_0.80.log
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.2307, mAP@0.5=0.1431, mAP@0.7=0.0268
+=== oracle  pos_std=0.80 rot_std=8.0  -> runlogs/estimated_sigma/oracle_0.80.log
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.2293, mAP@0.5=0.1400, mAP@0.7=0.0254
+=== estimated  pos_std=0.80 rot_std=8.0  -> runlogs/estimated_sigma/estimated_0.80.log
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.2221, mAP@0.5=0.1353, mAP@0.7=0.0254
+ALL DONE

@@ -22,6 +22,7 @@ from opencood.utils import eval_utils_isaac
 from opencood.utils import pcd_utils
 from opencood.utils.freespace_uncertainty import (
     FreeSpaceContradiction,
+    RegimeAdaptiveCalibration,
     parse_bins as parse_freespace_bins,
     sigma_from_score,
 )
@@ -2216,6 +2217,22 @@ def test_parser():
                              'degrees. Defaults to --pose_noise_rot_std.')
     parser.add_argument('--sensitivity_csv', type=str, default='',
                         help='where to write the per-sample probe record.')
+    parser.add_argument('--regime_window', type=int, default=0,
+                        help='frames of score history used to pick which '
+                             'score-to-sigma calibration applies. 0 disables '
+                             'and keeps a single calibration; 20 is the '
+                             'measured setting.')
+    parser.add_argument('--regime_threshold', type=float, default=0.55,
+                        help='window median below which the pair is treated as '
+                             'well localised and the low-regime calibration is '
+                             'used.')
+    parser.add_argument('--regime_low_bins', type=str,
+                        default='0.650:0,0.800:1.0,inf:2.0',
+                        help='calibration for the well-localised regime, where '
+                             'blurring a correct pose is the dominant cost.')
+    parser.add_argument('--regime_low_fallback', type=float, default=0.0,
+                        help='fallback sigma when there is no evidence and the '
+                             'pair looks well localised.')
     parser.add_argument('--oracle_sigma_bins', type=str, default=None,
                         help='Oracle experiment: pick the partner blur sigma per sample '
                              'from the true alignment error. Format "limit:sigma,..." in '
@@ -2886,8 +2903,14 @@ def _vis_sample_info(opencood_dataset, expanded_idx):
 
 
 def _freespace_sample_sigma(estimator, bins, fallback, opencood_dataset, idx,
-                            pairwise_t_matrix, log):
-    """Blur sigma for this sample, from the free-space contradiction score."""
+                            pairwise_t_matrix, log, regime=None):
+    """Blur sigma for this sample, from the free-space contradiction score.
+
+    With a regime object, the calibration itself is chosen from a window of
+    earlier scores before this frame's score is mapped through it.
+    """
+    if regime is not None:
+        bins, fallback = regime.current()
     if pairwise_t_matrix is None:
         return float(fallback)
     records = _get_opv2v_sample_records(opencood_dataset, idx)
@@ -2907,6 +2930,8 @@ def _freespace_sample_sigma(estimator, bins, fallback, opencood_dataset, idx,
     # into the ego frame under the pose the model believes, not the true one.
     transform = pairwise_t_matrix[0, 1, 0].detach().cpu().numpy()
     score, judgeable = estimator.score(ego_pcd, partner_pcd, transform)
+    if regime is not None:
+        regime.observe(score)
     sigma = sigma_from_score(score, bins, fallback)
     log.append((float(score), int(judgeable), float(sigma)))
     return sigma
@@ -3640,6 +3665,7 @@ def main():
         model.fusion_net.partner_blur_sigma = float(opt.partner_blur_sigma)
         print(f"Partner BEV blur enabled: sigma={opt.partner_blur_sigma} cells")
     freespace_estimator = None
+    regime_calibration = None
     estimated_sigma_bins = None
     estimated_sigma_log = []
     if getattr(opt, 'estimated_sigma_bins', None):
@@ -3651,6 +3677,21 @@ def main():
             "Estimated per-sample blur sigma enabled: "
             f"{estimated_sigma_bins}, fallback {opt.estimated_sigma_fallback}"
         )
+        if opt.regime_window > 0:
+            regime_calibration = RegimeAdaptiveCalibration(
+                low_bins=parse_freespace_bins(opt.regime_low_bins),
+                low_fallback=opt.regime_low_fallback,
+                high_bins=estimated_sigma_bins,
+                high_fallback=opt.estimated_sigma_fallback,
+                window=opt.regime_window,
+                threshold=opt.regime_threshold,
+            )
+            print(
+                f"Regime-adaptive calibration enabled: window "
+                f"{opt.regime_window}, threshold {opt.regime_threshold}, "
+                f"well-localised bins {opt.regime_low_bins} with fallback "
+                f"{opt.regime_low_fallback}"
+            )
     sensitivity_probe = None
     sensitivity_perturbations = None
     sensitivity_log = []
@@ -4009,6 +4050,7 @@ def main():
                     i,
                     batch_data.get('ego', {}).get('pairwise_t_matrix'),
                     estimated_sigma_log,
+                    regime_calibration,
                 )
             setattr(model, "save_feature_debug", save_feature_vis)
             infer_result = inference_isaac_center_head(
@@ -4345,6 +4387,8 @@ def main():
         for value in sorted(set(sigmas.tolist())):
             share = 100.0 * float((sigmas == value).mean())
             print(f"  sigma={value:.2f} chosen for {share:.1f}% of samples")
+        if regime_calibration is not None:
+            print(f"  regime: {regime_calibration.summary()}")
 
     if sensitivity_log:
         import csv as _csv

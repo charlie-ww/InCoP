@@ -1,0 +1,37 @@
+=== est_fb0 pos_std=0.00 -> runlogs/estimated_sigma/est_fb0_0.00.log
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.3554, mAP@0.5=0.2265, mAP@0.7=0.0391
+=== est_hi pos_std=0.00 -> runlogs/estimated_sigma/est_hi_0.00.log
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.3703, mAP@0.5=0.2361, mAP@0.7=0.0415
+=== est_both pos_std=0.00 -> runlogs/estimated_sigma/est_both_0.00.log
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.3837, mAP@0.5=0.2443, mAP@0.7=0.0425
+=== est_fb0 pos_std=0.10 -> runlogs/estimated_sigma/est_fb0_0.10.log
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.2750, mAP@0.5=0.1559, mAP@0.7=0.0254
+=== est_hi pos_std=0.10 -> runlogs/estimated_sigma/est_hi_0.10.log
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.2777, mAP@0.5=0.1526, mAP@0.7=0.0238
+=== est_both pos_std=0.10 -> runlogs/estimated_sigma/est_both_0.10.log
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.2776, mAP@0.5=0.1502, mAP@0.7=0.0237
+=== est_fb0 pos_std=0.20 -> runlogs/estimated_sigma/est_fb0_0.20.log
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.2415, mAP@0.5=0.1404, mAP@0.7=0.0251
+=== est_hi pos_std=0.20 -> runlogs/estimated_sigma/est_hi_0.20.log
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.2334, mAP@0.5=0.1308, mAP@0.7=0.0230
+=== est_both pos_std=0.20 -> runlogs/estimated_sigma/est_both_0.20.log
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.2255, mAP@0.5=0.1263, mAP@0.7=0.0217
+=== est_fb0 pos_std=0.30 -> runlogs/estimated_sigma/est_fb0_0.30.log
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.2213, mAP@0.5=0.1325, mAP@0.7=0.0241
+=== est_hi pos_std=0.30 -> runlogs/estimated_sigma/est_hi_0.30.log
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.2197, mAP@0.5=0.1284, mAP@0.7=0.0232
+=== est_both pos_std=0.30 -> runlogs/estimated_sigma/est_both_0.30.log
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.2121, mAP@0.5=0.1235, mAP@0.7=0.0224
+=== est_fb0 pos_std=0.60 -> runlogs/estimated_sigma/est_fb0_0.60.log
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.2082, mAP@0.5=0.1270, mAP@0.7=0.0249
+=== est_hi pos_std=0.60 -> runlogs/estimated_sigma/est_hi_0.60.log
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.2116, mAP@0.5=0.1283, mAP@0.7=0.0243
+=== est_both pos_std=0.60 -> runlogs/estimated_sigma/est_both_0.60.log
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.1988, mAP@0.5=0.1209, mAP@0.7=0.0223
+=== est_fb0 pos_std=0.80 -> runlogs/estimated_sigma/est_fb0_0.80.log
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.2067, mAP@0.5=0.1284, mAP@0.7=0.0232
+=== est_hi pos_std=0.80 -> runlogs/estimated_sigma/est_hi_0.80.log
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.2126, mAP@0.5=0.1305, mAP@0.7=0.0245
+=== est_both pos_std=0.80 -> runlogs/estimated_sigma/est_both_0.80.log
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.1969, mAP@0.5=0.1208, mAP@0.7=0.0221
+ALL DONE

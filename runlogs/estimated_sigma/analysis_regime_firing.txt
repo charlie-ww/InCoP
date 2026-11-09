@@ -1,0 +1,31 @@
+usable rows 13972 of 16400  (2428 unjudgeable -> deployed falls back)
+
+ sigma      n   median   frame<T  roll20<T  iid20<T
+  0.00    348    0.435     64.9%     77.0%    92.7%
+  0.05   1743    0.500     56.4%     57.8%    71.5%
+  0.10   1745    0.600     43.4%     38.9%    26.8%
+  0.15   1730    0.688     34.6%     23.9%     7.4%
+  0.20   1709    0.730     28.4%     15.6%     1.8%
+  0.30   1709    0.810     21.2%      7.1%     0.2%
+  0.40   1690    0.855     16.8%      3.6%     0.0%
+  0.60   1670    0.913     12.2%      1.8%     0.0%
+  0.80   1628    0.931      9.0%      0.0%     0.0%
+
+ sigma  csv iid-20  deployed  gap
+  0.00       92.7%     71.4%  -21.3 pts
+  0.10       26.8%     40.7%  +13.9 pts
+  0.20        1.8%     20.2%  +18.4 pts
+  0.30        0.2%      8.0%  +7.8 pts
+  0.60        0.0%      3.0%  +3.0 pts
+  0.80        0.0%      0.0%  +0.0 pts
+
+csv frames 357, cases 63; NaN share by level:
+  sigma=0.0   unjudgeable  13.0%
+  sigma=0.05  unjudgeable  12.8%
+  sigma=0.1   unjudgeable  12.8%
+  sigma=0.15  unjudgeable  13.5%
+  sigma=0.2   unjudgeable  14.5%
+  sigma=0.3   unjudgeable  14.5%
+  sigma=0.4   unjudgeable  15.5%
+  sigma=0.6   unjudgeable  16.5%
+  sigma=0.8   unjudgeable  18.6%

@@ -1,0 +1,11 @@
+=== none  pos_std=0.00 -> runlogs/estimated_sigma/none_0.00.log
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.3986, mAP@0.5=0.2523, mAP@0.7=0.0447
+=== fixed1  pos_std=0.00 -> runlogs/estimated_sigma/fixed1_0.00.log
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.3411, mAP@0.5=0.2145, mAP@0.7=0.0373
+=== fixed2  pos_std=0.00 -> runlogs/estimated_sigma/fixed2_0.00.log
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.2805, mAP@0.5=0.1707, mAP@0.7=0.0300
+=== oracle  pos_std=0.00 -> runlogs/estimated_sigma/oracle_0.00.log
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.3984, mAP@0.5=0.2523, mAP@0.7=0.0446
+=== estimated  pos_std=0.00 -> runlogs/estimated_sigma/estimated_0.00.log
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.3422, mAP@0.5=0.2185, mAP@0.7=0.0376
+ALL DONE
