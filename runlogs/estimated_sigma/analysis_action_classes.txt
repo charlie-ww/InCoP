@@ -1,0 +1,41 @@
+=== 1. what hedging can buy, against two baselines ===
+  best single constant across all levels      0.2500
+  best constant chosen per level              0.2721   +0.0221
+  perfect PER-FRAME hedging (oracle)          0.2735   +0.0235
+  -> everything hedging can do, including a perfect per-frame choice,
+     is worth +0.0235 over one constant.
+
+=== 2. what correcting the pose buys, by how far it gets ===
+  Reading down a column: if correction takes you from the row's noise
+  level to the column's, and you then hedge optimally, you score the
+  column's best-hedge value.
+
+  from sigma_pos  best hedge      ->0.00   ->0.10   ->0.20   ->0.30   ->0.60
+            0.10      0.2810     +0.1176                                    
+            0.20      0.2506     +0.1480  +0.0304                           
+            0.30      0.2407     +0.1579  +0.0403  +0.0099                  
+            0.60      0.2309     +0.1677  +0.0501  +0.0197  +0.0098         
+            0.80      0.2307     +0.1679  +0.0503  +0.0199  +0.0100  +0.0002
+
+  perfect correction, averaged over the five levels with real misalignment: +0.1518
+
+=== 3. the gradient: partial correction is nearly worthless here ===
+  halving 0.20 -> 0.10: +0.0304
+  halving 0.60 -> 0.30: +0.0098
+  mean of the two true halvings available in the grid: +0.0201
+  Halving the error from 0.60 is worth +0.0098; from 0.20 it is +0.0304.
+  The payoff is concentrated at the very end of the correction, because
+  the objects stop overlapping themselves long before the error is gone.
+
+=== 4. how tight does the correction have to be? ===
+  median indoor object breaks IoU@0.3 at   0.161 m
+  -> required residual error               0.161 m  (sigma_pos < 0.075)
+  outdoor car breaks IoU@0.3 at            1.23 m
+  -> required residual error               1.23 m  (sigma_pos < 0.57)
+
+  The indoor requirement is 7.6x tighter.
+  Per class, the tightest is the fire extinguisher at 0.109 m -> 11x tighter.
+
+  And it has to be met with fewer correspondences, not more: 53.3% of
+  low-overlap frames have at most two co-visible objects, against 10.9%
+  in the high-overlap split (runlogs/overlap_geometry).
