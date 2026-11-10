@@ -1,0 +1,109 @@
+# Can the ego see the partner robot itself?
+
+The project's central tension is that the partner is useful precisely because it
+looks where the ego cannot, which is also why there is no shared observation to
+align with. Seeing the *partner robot* would break that tension for free: it is
+one correspondence that needs no scene overlap at all. It is also the strongest
+objection to this whole research direction, so it is worth knowing its size.
+
+Test split, 2,440 frames, 89 degree forward wedge, BEV crop x in [0, 22.4],
+y in [-11.2, 11.2].
+
+## 1. The geometry is very favourable
+
+| | frames | share |
+|---|---|---|
+| ego's wedge contains the partner's position | 1,804 | **73.9%** |
+| partner's wedge contains the ego's position | 373 | 15.3% |
+| at least one direction | 1,971 | 80.8% |
+| both directions | 206 | 8.4% |
+
+Median inter-robot distance 8.04 m; when in the wedge, median bearing 13.9 deg
+off boresight. Line of sight clear of the ego's own obstacle returns in 70.0%
+of in-wedge frames.
+
+The asymmetry (73.9% vs 15.3%) is a property of the generator: the partner
+trails or flanks the ego rather than facing it.
+
+## 2. But the partner robot is not in the data
+
+It is not in the annotations - the classes are chairs, extinguishers, plants,
+cones, bins, bags and signs - and it is **not rendered in the LiDAR either**:
+
+| within 0.5 m of where the partner is | obstacle-band returns (median) |
+|---|---|
+| at the partner's position | **2** |
+| at control bearings, same range, floor visible | **31** |
+
+The ratio is 0.06x: the partner's position has *fewer* returns than ordinary
+room. Two more facts settle it. The ego sees the **floor** at the partner's
+position in 70.3% of frames, which a robot standing there would block. And the
+height profile of returns near the partner is 29.2% floor plus 57.1% ceiling,
+with about 0.2% in each band between - the ego looks straight through it.
+
+So this analysis cannot be turned into a method on this dataset. Whether the
+robots can be rendered is a generator question for 奕維, alongthe same lines as
+the missing `dual_case_random` data.
+
+### A note on the first run
+
+The first version reported "100% of lines of sight blocked" and a 4.05x ratio
+the *other* way. Both were artefacts of not filtering the floor: the floor is
+45.9% of all returns and the ceiling 38.4%, so every cell along every ray had a
+return and every position looked occupied. The obstacle band is z in
+(-0.20, 2.30), measured from the clouds. Numbers above are post-fix.
+
+## 3. It fails in the same direction as everything else, but only partly
+
+Seeing the partner is positively correlated with scene co-visibility
+(Pearson +0.304, Spearman +0.315), so it shares the free-space signal's
+weakness: most available when least needed. But the correlation is weak enough
+to leave real coverage of the hard frames:
+
+| co-visible scene objects | frames | ego sees the partner |
+|---|---|---|
+| 0 | 634 | **51.7%** |
+| 1 | 329 | 78.7% |
+| 2 | 337 | 70.3% |
+| 3-5 | 756 | 74.9-84.0% |
+| >= 6 | 384 | 98-100% |
+
+**In 51.7% of the frames with zero co-visible objects the ego can still see the
+partner robot.** Those are exactly the frames that defeat CoAlign, HERO and
+V2X-PC. Direct observation would cover half of them.
+
+Where it fails, it fails because the robots face away from each other: median
+heading difference 45.6 deg when the partner is not visible against 24.2 deg
+when it is.
+
+## 4. Why it still does not rescue the problem
+
+Seeing the partner gives you its **position**. Position is not what breaks us.
+
+A partner heading error of delta displaces an object it reports at range r from
+itself by r * delta. With the median indoor object breaking IoU@0.3 at 0.161 m:
+
+| object's range from the partner | indoor heading budget | outdoor car budget |
+|---|---|---|
+| 4 m | 2.31 deg | 17.62 deg |
+| 8 m | **1.15 deg** | 8.81 deg |
+| 15 m | 0.62 deg | 4.70 deg |
+| 22.4 m | **0.41 deg** | 3.15 deg |
+
+So even with the partner's position known exactly, its **yaw** has to be right
+to about one degree for mid-range objects and 0.4 degrees at the edge of its
+range, against 8.8 and 3.1 degrees for an outdoor car. At 8 m a robot is a
+small, roughly symmetric blob; recovering its yaw to a degree from one LiDAR
+view is not a solved problem.
+
+This is the honest answer to "why not just look at the other robot", and it is
+the same order-of-magnitude argument as the object-size result: the indoor
+tolerance is about 8x tighter, so a method that is sufficient outdoors is not
+sufficient here.
+
+## Files
+
+- `measure_partner_visibility.py` / `run_visibility.log` - tests 1-3
+- `cross_overlap.py` / `run_cross.log` - sections 3 and 4
+- `partner_visibility_test.csv` - per-frame, joinable with
+  `runlogs/overlap_geometry/perframe_overlap.csv` on (case, frame)

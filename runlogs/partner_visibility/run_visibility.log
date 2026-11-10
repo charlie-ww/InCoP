@@ -1,0 +1,44 @@
+=== 1. geometry: is the partner inside the sensing wedge? (test, 2440 frames) ===
+  ego sees partner's position       1804   73.9%
+  partner sees ego's position        373   15.3%
+  at least one direction            1971   80.8%
+  both directions                    206    8.4%
+  (wedge = 89.0 deg forward, x in [0.0,22.4], y in [-11.2,11.2])
+
+  inter-robot distance: median 8.04 m, range 3.42-19.34 m
+  when in the wedge: distance median 7.96 m, |bearing| median 13.9 deg
+
+=== 2/3. occlusion and returns, on 300 in-wedge frames ===
+  ego also saw the FLOOR at the partner's position  211/300  70.3%   (a robot standing there would block the floor)
+  line of sight blocked by the ego's own returns   90/300  30.0%
+  clear line of sight                              210/300  70.0%
+
+  LiDAR points within 0.5 m of where the partner is:
+    at the partner's position   median    2.0   mean     2.8   zero in  32.0% of frames
+    at control bearings         median   31.0   mean    43.5   zero in  22.2% of frames
+    ratio of medians            0.06x
+
+  height profile of the 10680 returns within 0.5 m of the partner:
+    z -0.50..-0.25     3119   29.2%
+    z -0.25..+0.00     1089   10.2%
+    z +0.00..+0.25       26    0.2%
+    z +0.25..+0.50       16    0.1%
+    z +0.50..+0.75       20    0.2%
+    z +0.75..+1.00       21    0.2%
+    z +1.00..+1.25       20    0.2%
+    z +1.25..+1.50       22    0.2%
+    z +1.50..+1.75       23    0.2%
+    z +1.75..+2.00       94    0.9%
+    z +2.00..+2.25       58    0.5%
+    z +2.25..+2.50       70    0.7%
+    z +2.50..+2.75     6102   57.1%
+    (a rendered robot would show a bump away from the floor and
+     ceiling bands; walls alone give a flat spread)
+
+  Reading this: a clearly higher count at the partner's position
+  than at control bearings means the simulator rendered the partner
+  robot, so the ego could in principle detect and use it. Similar
+  counts mean the returns are just the room, and the partner is
+  invisible in this dataset however good the geometry is.
+
+wrote /nfs/home/charlie/InCoP/runlogs/partner_visibility/partner_visibility_test.csv

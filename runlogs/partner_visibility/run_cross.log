@@ -1,0 +1,51 @@
+joined 2440 frames of 2440 visibility rows and 3941 overlap rows
+
+splits present: ['low']
+using 2440 low-overlap frames
+
+=== co-visible scene objects vs seeing the partner robot ===
+  n_shared  frames  sees partner
+         0     634         51.7%
+         1     329         78.7%
+         2     337         70.3%
+         3     326         84.0%
+         4     243         74.9%
+         5     187         77.0%
+         6     201         98.0%
+         7      77        100.0%
+         8      51        100.0%
+       >=9      55        100.0%
+
+=== the question that matters: the hard frames ===
+  frames with <=2 co-visible objects (the ones that break CoAlign/HERO):
+    1300 frames, 53.3% of the split
+    ego sees the partner robot in 63.4% of them
+  frames with >2 co-visible objects:
+    1140 frames, ego sees the partner in 86.0%
+
+  zero co-visible objects: 634 frames, sees partner in 51.7%
+
+  correlation between n_shared and seeing the partner: Pearson +0.304, Spearman +0.315
+
+=== geometry of the two cases ===
+  sees partner   n= 1804  dist median  7.96 m  heading diff median   24.2 deg  n_shared median 3.0  n_partner_only median 1.0
+  does not       n=  636  dist median  8.49 m  heading diff median   45.6 deg  n_shared median 1.0  n_partner_only median 2.0
+
+=== but is SEEING the partner accurate enough? ===
+  displacement budget: 0.161 m (median indoor object, IoU@0.3)
+
+   object range from partner  indoor heading budget  outdoor (car) budget
+                     4.0 m                 2.31 deg              17.62 deg
+                     8.0 m                 1.15 deg               8.81 deg
+                    15.0 m                 0.62 deg               4.70 deg
+                    22.4 m                 0.41 deg               3.15 deg
+
+  So even with the partner's POSITION known exactly, its HEADING has
+  to be right to about 1 degree for mid-range objects and 0.4 degrees
+  at the edge of its range. A car outdoors gets 8.8 and 3.1 degrees.
+  Median inter-robot distance here is 8.04 m, so a
+  robot is a small, roughly symmetric blob at that range - recovering
+  its yaw to a degree from one LiDAR view is not a solved problem.
+
+  This is the honest answer to 'why not just look at the other robot':
+  seeing it gives you position, and position is not what breaks us.
