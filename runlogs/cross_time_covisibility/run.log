@@ -1,0 +1,26 @@
+2440 frames, 65 episodes, median episode length 38 frames
+
+=== premises ===
+  same object id re-observed 34021 times; displacement from first sighting: median 0.0000 m, 99th pct 0.0000 m, max 0.0000 m
+  robot step between consecutive frames: median 0.08 m, 90th pct 0.13 m
+
+=== correspondences available per frame ===
+                                       >=1     >=2     >=3  median
+same frame (what the field counts)   74.6%   63.8%   53.1%     3.0
+partner now vs ego memory            80.7%   68.3%   57.9%     3.0
+ego now vs partner memory            78.6%   71.9%   61.3%     3.0
+both memories                        85.1%   76.1%   67.4%     4.0
+
+=== the frames that defeat single-frame methods (same-frame <= 2) ===
+  1145 frames (46.9%)
+  rescued to >=3 by partner now vs ego memory :  10.3%
+  rescued to >=3 by both memories             :  30.5%
+  zero same-frame (620 frames): >=3 via both memories 14.8%, >=1 41.3%
+
+=== how fast does memory build up? (frames into the episode) ===
+  frames  0-1 : n=  65  same-frame>=3  56.9%   both-memories>=3  56.9%
+  frames  1-5 : n= 249  same-frame>=3  57.8%   both-memories>=3  57.8%
+  frames  5-10: n= 310  same-frame>=3  56.8%   both-memories>=3  60.0%
+  frames 10-20: n= 620  same-frame>=3  50.3%   both-memories>=3  62.7%
+  frames 20-40: n= 973  same-frame>=3  54.4%   both-memories>=3  73.7%
+  frames 40-99: n= 223  same-frame>=3  43.5%   both-memories>=3  76.7%

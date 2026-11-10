@@ -1,0 +1,15 @@
+chance: translation 0.496 m (<=0.16 m by chance 5.3%), yaw 3.23 deg (<=1.15 by chance 23.1%)
+
+        frames  transl. median  <=0.16 m  <=0.30 m  tied (median)  yaw median  <=1.15    n
+             1         0.244 m     39.0%     50.8%              1      1.00deg   64.4%   59
+             3         0.200 m     46.7%     60.0%              1      1.00deg   75.0%   60
+             5         0.171 m     50.0%     61.7%              1      1.00deg   75.0%   60
+            10         0.141 m     53.3%     66.7%              1      1.00deg   73.3%   60
+            20         0.200 m     46.7%     61.7%              1      1.00deg   68.3%   60
+            30         0.200 m     41.5%     64.2%              1      1.00deg   69.8%   53
+ whole episode         0.200 m     46.9%     73.4%              1      1.00deg   67.2%   64
+
+any window of N consecutive frames (all positions, all episodes):
+  N= 1: median 0.374 m, <=0.16 m 21.8%, <=0.30 m 40.4%  (2235 windows)
+  N=10: median 0.305 m, <=0.16 m 28.6%, <=0.30 m 49.7%  (1810 windows)
+  N=30: median 0.283 m, <=0.16 m 36.8%, <=0.30 m 50.9%  (687 windows)

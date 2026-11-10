@@ -1,0 +1,12 @@
+scored 65 episodes in 163s
+
+error of the best candidate vs how many frames are pooled
+(truth is 0; chance for the translation grid is about 0.46 m, yaw 3.2 deg)
+ frames pooled  transl. median  <=0.16 m  <=0.30 m  yaw median  <=1.15 deg  episodes
+             1         0.200 m     44.1%     59.3%      1.00deg       64.4%        59
+             3         0.146 m     51.7%     66.7%      1.00deg       76.7%        60
+             5         0.146 m     51.7%     65.0%      1.00deg       75.0%        60
+            10         0.141 m     55.0%     70.0%      1.00deg       73.3%        60
+            20         0.200 m     48.3%     63.3%      1.00deg       68.3%        60
+            30         0.200 m     43.4%     66.0%      1.00deg       69.8%        53
+ whole episode         0.154 m     51.6%     76.6%      1.00deg       67.2%        64

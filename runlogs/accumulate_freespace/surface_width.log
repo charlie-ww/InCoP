@@ -1,0 +1,14 @@
+=== 1. free-space localisation by number of co-visible objects ===
+ co-visible  frames  median err  <=0.16 m  <=0.30 m
+          0     432     0.442 m      1.2%      6.0%
+        1-2     513     0.457 m     15.4%     29.6%
+        3-5     724     0.316 m     27.8%     45.7%
+        >=6     566     0.224 m     35.7%     69.4%
+  (chance: median 0.496 m, <=0.16 m 5.3%)
+
+=== 2. does the width of the low-cost region predict the error? ===
+  Spearman(width, error) over 2235 frames: +0.151
+  narrowest third  width median 0.07 m -> error median 0.283 m, <=0.16 m  32.8%
+  middle third     width median 0.14 m -> error median 0.316 m, <=0.16 m  26.1%
+  widest third     width median 0.33 m -> error median 0.429 m, <=0.16 m   6.2%
+  within zero-co-visible frames only: Spearman -0.251
