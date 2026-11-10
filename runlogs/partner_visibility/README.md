@@ -9,6 +9,30 @@ objection to this whole research direction, so it is worth knowing its size.
 Test split, 2,440 frames, 89 degree forward wedge, BEV crop x in [0, 22.4],
 y in [-11.2, 11.2].
 
+## What section 1 actually measures - read this first
+
+Section 1 is **not** a measurement of the ego seeing the partner. It is pure
+geometry: the partner's **ground-truth position** is read from the annotations,
+transformed into the ego frame, and tested for membership of the sensing wedge,
+and then a straight line to it is walked through the ego's own obstacle
+returns. The correct reading is "the partner's position lies inside the region
+the ego's sensor covers, with nothing in the way".
+
+Two consequences, which must always be stated with the number:
+
+- **It is counterfactual.** It says what the ego *would* receive if the robot
+  were rendered. It is therefore an upper bound on what direct observation
+  could offer, not a count of frames where it works today, which is zero
+  (section 2).
+- **It uses information the ego does not have.** The test keys off the
+  partner's true pose, and not knowing that pose is the problem this project
+  exists to study.
+
+So section 1 answers "how often does the trajectory geometry permit direct
+observation, seen from outside the system". It bounds an opportunity; it is
+not an observation. The phrase "sees the partner" is avoided below for that
+reason.
+
 ## 1. The geometry is very favourable
 
 | | frames | share |
@@ -55,12 +79,12 @@ return and every position looked occupied. The obstacle band is z in
 
 ## 3. It fails in the same direction as everything else, but only partly
 
-Seeing the partner is positively correlated with scene co-visibility
+Having the partner inside the wedge is positively correlated with scene co-visibility
 (Pearson +0.304, Spearman +0.315), so it shares the free-space signal's
 weakness: most available when least needed. But the correlation is weak enough
 to leave real coverage of the hard frames:
 
-| co-visible scene objects | frames | ego sees the partner |
+| co-visible scene objects | frames | partner's position inside the wedge |
 |---|---|---|
 | 0 | 634 | **51.7%** |
 | 1 | 329 | 78.7% |
@@ -68,8 +92,8 @@ to leave real coverage of the hard frames:
 | 3-5 | 756 | 74.9-84.0% |
 | >= 6 | 384 | 98-100% |
 
-**In 51.7% of the frames with zero co-visible objects the ego can still see the
-partner robot.** Those are exactly the frames that defeat CoAlign, HERO and
+**In 51.7% of the frames with zero co-visible objects the partner's position is
+still inside the ego's wedge.** Those are exactly the frames that defeat CoAlign, HERO and
 V2X-PC. Direct observation would cover half of them.
 
 Where it fails, it fails because the robots face away from each other: median
@@ -78,7 +102,7 @@ when it is.
 
 ## 4. Why it still does not rescue the problem
 
-Seeing the partner gives you its **position**. Position is not what breaks us.
+Detecting the partner would give you its **position**. Position is not what breaks us.
 
 A partner heading error of delta displaces an object it reports at range r from
 itself by r * delta. With the median indoor object breaking IoU@0.3 at 0.161 m:
