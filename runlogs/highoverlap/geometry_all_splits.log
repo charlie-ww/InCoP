@@ -1,0 +1,6 @@
+split     scene              frames  dist med   min   max head diff med    max  ahead/behind   side  other in view
+train     full_warehouse_v1     117     1.10m  1.00  2.31         0.02°   1.1°        0.91 m  0.82m          47.0%
+train     office_v1             404     1.00m  0.99  2.53         0.03°   3.1°        0.44 m  0.95m          25.0%
+validate  full_warehouse_v1      50     1.20m  1.00  2.31         0.01°   0.6°        0.70 m  0.86m          32.0%
+validate  office_v1             121     1.00m  0.97  2.50         0.08°   5.3°        0.46 m  0.96m          23.1%
+test      hospital_v1           376     1.00m  0.97  2.40         0.03°   3.6°        0.39 m  0.96m          22.6%

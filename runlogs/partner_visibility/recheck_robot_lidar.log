@@ -1,0 +1,44 @@
+
+=== high-overlap train: 400 views where the other robot is inside the wedge (distance median 1.40 m) ===
+  returns between 7 cm above the floor and z=+0.25, within 0.45 m:
+    at the other robot : median   568  mean   611.8  none in   0.0%
+    at control position: median     0  mean   181.5  none in  57.2%
+  height histogram (sensor frame; floor is near -0.47):
+    z -0.50  robot  162492  control  274471
+    z -0.45  robot   17309  control    5425
+    z -0.40  robot   42169  control   10337
+    z -0.35  robot   41139  control    9386
+    z -0.30  robot   50435  control   10232
+    z -0.25  robot   74206  control   14579
+    z -0.20  robot   10783  control    3325
+    z -0.15  robot    9190  control    4525
+    z -0.10  robot    6709  control    3225
+    z -0.05  robot    6045  control    3930
+    z -0.00  robot    4036  control    3328
+    z +0.05  robot       9  control    2087
+    z +0.10  robot       0  control    2023
+    z +0.15  robot       0  control    1971
+    z +0.20  robot       0  control    3636
+    z +0.25  robot       0  control    1789
+
+=== low-overlap test: 400 views where the other robot is inside the wedge (distance median 7.52 m) ===
+  returns between 7 cm above the floor and z=+0.25, within 0.45 m:
+    at the other robot : median    12  mean    11.9  none in   2.0%
+    at control position: median     0  mean     1.5  none in  84.0%
+  height histogram (sensor frame; floor is near -0.47):
+    z -0.50  robot    1528  control     305
+    z -0.45  robot     373  control      42
+    z -0.40  robot    1186  control      55
+    z -0.35  robot     897  control      15
+    z -0.30  robot     865  control      55
+    z -0.25  robot     920  control      33
+    z -0.20  robot     143  control      17
+    z -0.15  robot     389  control      45
+    z -0.10  robot      84  control       2
+    z -0.05  robot     272  control      73
+    z -0.00  robot       3  control      72
+    z +0.05  robot       3  control       3
+    z +0.10  robot       2  control     111
+    z +0.15  robot       0  control      24
+    z +0.20  robot       1  control      79
+    z +0.25  robot       0  control      89

@@ -49,33 +49,32 @@ of in-wedge frames.
 The asymmetry (73.9% vs 15.3%) is a property of the generator: the partner
 trails or flanks the ego rather than facing it.
 
-## 2. But the partner robot is not in the data
+## 2. CORRECTED 2026-11-11: the partner robot IS in the LiDAR
 
-It is not in the annotations - the classes are chairs, extinguishers, plants,
-cones, bins, bags and signs - and it is **not rendered in the LiDAR either**:
+The first version of this section said the robot was not rendered. That was
+wrong. The camera images show the other robot, and so does the LiDAR
+(`recheck_robot_lidar.py`):
 
-| within 0.5 m of where the partner is | obstacle-band returns (median) |
-|---|---|
-| at the partner's position | **2** |
-| at control bearings, same range, floor visible | **31** |
+| returns within 0.45 m, more than 7 cm above the floor | median | none at all |
+|---|---|---|
+| low-overlap test, at the other robot (median 7.5 m away) | **12** | 2.0% |
+| low-overlap test, at a control position | 0 | 84.0% |
+| high-overlap train, at the other robot (median 1.4 m away) | **568** | 0.0% |
+| high-overlap train, at a control position | 0 | 57.2% |
 
-The ratio is 0.06x: the partner's position has *fewer* returns than ordinary
-room. Two more facts settle it. The ego sees the **floor** at the partner's
-position in 70.3% of frames, which a robot standing there would block. And the
-height profile of returns near the partner is 29.2% floor plus 57.1% ceiling,
-with about 0.2% in each band between - the ego looks straight through it.
+What went wrong: the robot is low. Its body sits between z = -0.45 and 0 in the
+sensor frame, the top being about level with the LiDAR. The original test took
+everything below z = -0.20 to be floor and discarded most of the body. "The ego
+sees the floor at the partner's position" was not evidence either: a 0.5 m
+circle is larger than the robot, so there is always floor around it.
 
-So this analysis cannot be turned into a method on this dataset. Whether the
-robots can be rendered is a generator question for 奕維, alongthe same lines as
-the missing `dual_case_random` data.
+So when the other robot is inside the wedge, the LiDAR returns something from
+it in 98% of low-overlap views. Direct observation of the partner can be tested
+on this dataset as it stands. The robot is still not an annotated class.
 
-### A note on the first run
-
-The first version reported "100% of lines of sight blocked" and a 4.05x ratio
-the *other* way. Both were artefacts of not filtering the floor: the floor is
-45.9% of all returns and the ceiling 38.4%, so every cell along every ray had a
-return and every position looked occupied. The obstacle band is z in
-(-0.20, 2.30), measured from the clouds. Numbers above are post-fix.
+Sections 1, 3 and 4 are unaffected: they are geometry and arithmetic, and the
+heading-budget argument in section 4 now matters more, not less, because the
+baseline it argues against is runnable.
 
 ## 3. It fails in the same direction as everything else, but only partly
 
