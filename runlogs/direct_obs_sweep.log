@@ -1,0 +1,40 @@
+--- sanity_zero.log  on GPU 4
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.4119, mAP@0.5=0.2867, mAP@0.7=0.0642
+--- sanity_clean.log  on GPU 4
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.4123, mAP@0.5=0.2868, mAP@0.7=0.0647
+SANITY zero-noise=0.4119  clean-under-0.60=0.4123
+SANITY OK
+--- pos_visible_0.10.log  on GPU 4
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.3120, mAP@0.5=0.1718, mAP@0.7=0.0268
+--- pos_always_0.10.log  on GPU 4
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.3511, mAP@0.5=0.2031, mAP@0.7=0.0316
+--- pos_visible_0.20.log  on GPU 4
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.2451, mAP@0.5=0.1331, mAP@0.7=0.0219
+--- pos_always_0.20.log  on GPU 4
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.2961, mAP@0.5=0.1607, mAP@0.7=0.0245
+--- pos_visible_0.30.log  on GPU 4
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.2054, mAP@0.5=0.1131, mAP@0.7=0.0194
+    direct_obs[pos_visible]: partner robot seen in 52.1% of 2440 samples
+--- pos_always_0.30.log  on GPU 4
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.2539, mAP@0.5=0.1362, mAP@0.7=0.0213
+    direct_obs[pos_always]: partner robot seen in 100.0% of 2440 samples
+--- pos_visible_0.60.log  on GPU 4
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.1726, mAP@0.5=0.0994, mAP@0.7=0.0174
+    direct_obs[pos_visible]: partner robot seen in 52.1% of 2440 samples
+--- pos_always_0.60.log  on GPU 4
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.1980, mAP@0.5=0.1108, mAP@0.7=0.0187
+    direct_obs[pos_always]: partner robot seen in 100.0% of 2440 samples
+--- pos_visible_0.80.log  on GPU 4
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.1628, mAP@0.5=0.0950, mAP@0.7=0.0165
+    direct_obs[pos_visible]: partner robot seen in 52.1% of 2440 samples
+--- pos_always_0.80.log  on GPU 4
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.1878, mAP@0.5=0.1066, mAP@0.7=0.0175
+    direct_obs[pos_always]: partner robot seen in 100.0% of 2440 samples
+--- yaw_always_0.20.log  on GPU 4
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.2085, mAP@0.5=0.1067, mAP@0.7=0.0176
+    direct_obs[yaw_always]: partner robot seen in 100.0% of 2440 samples
+--- yaw_always_0.60.log  on GPU 4
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.1461, mAP@0.5=0.0869, mAP@0.7=0.0154
+    direct_obs[yaw_always]: partner robot seen in 100.0% of 2440 samples
+ALL DONE
+tgnotify: 已送出 Telegram 通知 [成功 (exit 0)] InCoP direct-observation upper bound (2 sanity + 12 runs)

@@ -1,0 +1,7 @@
+2440 test frames, a robot counts as seen with >= 3 LiDAR returns on its body
+  ego sees partner               52.1%
+  partner sees ego                3.6%
+  only the partner sees           3.0%   <- what one-sided ego checking misses
+  at least one sees the other    55.2%   -> relative POSITION measurable
+  both see each other             0.6%   -> relative HEADING measurable too
+  neither                        44.8%

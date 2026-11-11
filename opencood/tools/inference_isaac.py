@@ -2233,6 +2233,19 @@ def test_parser():
     parser.add_argument('--regime_low_fallback', type=float, default=0.0,
                         help='fallback sigma when there is no evidence and the '
                              'pair looks well localised.')
+    parser.add_argument('--direct_obs', type=str, default='off',
+                        choices=['off', 'pos_visible', 'pos_always',
+                                 'yaw_always', 'clean'],
+                        help='Upper bound for "just look at the other robot". '
+                             'pos_visible: wherever the ego LiDAR actually hits the '
+                             'partner robot, its position is taken as known exactly '
+                             'and only the heading stays noisy. pos_always: the same '
+                             'in every frame. yaw_always: the complement, heading '
+                             'exact and position noisy. clean: the true transform, '
+                             'as a check that this hook reproduces zero noise.')
+    parser.add_argument('--direct_obs_min_points', type=int, default=3,
+                        help='LiDAR returns on the partner robot needed to count it '
+                             'as seen.')
     parser.add_argument('--oracle_sigma_bins', type=str, default=None,
                         help='Oracle experiment: pick the partner blur sigma per sample '
                              'from the true alignment error. Format "limit:sigma,..." in '
@@ -2935,6 +2948,63 @@ def _freespace_sample_sigma(estimator, bins, fallback, opencood_dataset, idx,
     sigma = sigma_from_score(score, bins, fallback)
     log.append((float(score), int(judgeable), float(sigma)))
     return sigma
+
+
+def _partner_robot_returns(opencood_dataset, idx, clean_partner_to_ego):
+    """How many of the ego's LiDAR returns land on the partner robot's body.
+
+    The robot is low: its body sits between the floor and about the height of
+    the sensor, z in (-0.40, 0.05) of the ego LiDAR frame. A band that starts
+    higher discards it as floor.
+    """
+    records = _get_opv2v_sample_records(opencood_dataset, idx)
+    cav_ids = _sorted_cav_ids(records)
+    if len(cav_ids) < 2:
+        return 0
+    ego_cav_id = _vis_sample_info(opencood_dataset, idx).get("ego_cav_id")
+    if ego_cav_id not in records:
+        ego_cav_id = {str(c): c for c in cav_ids}.get(str(ego_cav_id), cav_ids[0])
+    ego_pcd = records[ego_cav_id].get("lidar")
+    if not ego_pcd:
+        return 0
+    pts = pcd_utils.pcd_to_np(ego_pcd)[:, :3]
+    px, py = float(clean_partner_to_ego[0, 3]), float(clean_partner_to_ego[1, 3])
+    near = np.hypot(pts[:, 0] - px, pts[:, 1] - py) <= 0.45
+    body = (pts[:, 2] > -0.40) & (pts[:, 2] < 0.05)
+    return int((near & body).sum())
+
+
+def _direct_obs_pairwise(mode, noisy, clean, opencood_dataset, idx, min_points,
+                         log):
+    """The transform the ego would use if it could measure the partner directly.
+
+    This is an upper bound, not a detector: where the partner robot is hit by
+    the ego's LiDAR its position is taken from the true transform. What it
+    isolates is whether knowing the partner's POSITION is enough when its
+    HEADING is still wrong.
+    """
+    if mode == 'off' or noisy is None or clean is None:
+        return noisy
+    out = noisy.clone()
+    n = noisy[0, 1, 0].detach().to(torch.float64)
+    c = clean[0, 1, 0].detach().to(torch.float64)
+    seen = True
+    if mode == 'pos_visible':
+        seen = _partner_robot_returns(
+            opencood_dataset, idx, c.cpu().numpy()) >= min_points
+    if mode == 'clean':
+        fixed = c.clone()
+    elif mode in ('pos_visible', 'pos_always'):
+        fixed = n.clone()
+        if seen:
+            fixed[:3, 3] = c[:3, 3]          # partner origin exact, heading noisy
+    else:                                     # yaw_always
+        fixed = n.clone()
+        fixed[:3, :3] = c[:3, :3]            # heading exact, position noisy
+    out[0, 1, 0] = fixed.to(out.dtype)
+    out[0, 0, 1] = torch.linalg.inv(fixed).to(out.dtype)
+    log.append(bool(seen))
+    return out
 
 
 def _cav_id_to_path_tag(cav_id):
@@ -3692,6 +3762,7 @@ def main():
                 f"well-localised bins {opt.regime_low_bins} with fallback "
                 f"{opt.regime_low_fallback}"
             )
+    direct_obs_log = []
     sensitivity_probe = None
     sensitivity_perturbations = None
     sensitivity_log = []
@@ -4052,6 +4123,15 @@ def main():
                     estimated_sigma_log,
                     regime_calibration,
                 )
+            if opt.direct_obs != 'off':
+                _ego_d = batch_data.get('ego', {})
+                _ego_d['pairwise_t_matrix'] = _direct_obs_pairwise(
+                    opt.direct_obs,
+                    _ego_d.get('pairwise_t_matrix'),
+                    _ego_d.get('pairwise_t_matrix_clean'),
+                    opencood_dataset, i, opt.direct_obs_min_points,
+                    direct_obs_log,
+                )
             setattr(model, "save_feature_debug", save_feature_vis)
             infer_result = inference_isaac_center_head(
                 batch_data, model, hypes["postprocess"], opt.fusion_method
@@ -4373,6 +4453,10 @@ def main():
     if torch.cuda.is_available():
         torch.cuda.empty_cache()
 
+    if direct_obs_log:
+        print(f"direct_obs[{opt.direct_obs}]: partner robot seen in "
+              f"{100.0 * sum(direct_obs_log) / len(direct_obs_log):.1f}% "
+              f"of {len(direct_obs_log)} samples")
     if estimated_sigma_log:
         scores = np.array([s for s, _, _ in estimated_sigma_log])
         sigmas = np.array([g for _, _, g in estimated_sigma_log])

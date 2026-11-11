@@ -1,0 +1,23 @@
+zero-noise mAP@0.3 = 0.3986
+
+ sigma  no fix best hedge hedge oracle pos if seen pos always yaw always
+  0.10  0.2693     0.2810       0.2906      0.3120     0.3511        -  
+  0.20  0.1918     0.2506       0.2505      0.2451     0.2961     0.2085
+  0.30  0.1656     0.2407       0.2419      0.2054     0.2539        -  
+  0.60  0.1438     0.2309       0.2304      0.1726     0.1980     0.1461
+  0.80  0.1427     0.2307       0.2293      0.1628     0.1878        -  
+
+share of the pose-error loss recovered (relative to no fix, of the gap to zero noise)
+ sigma pos if seen pos always yaw always   seen / always
+  0.10       33.0%      63.3%       -                52%
+  0.20       25.8%      50.4%       8.1%             51%
+  0.30       17.1%      37.9%       -                45%
+  0.60       11.3%      21.3%       0.9%             53%
+  0.80        7.9%      17.6%       -                45%
+
+against the best existing hedge (blur), same noise level
+  sigma=0.10: pos if seen +0.0310   pos always +0.0701
+  sigma=0.20: pos if seen -0.0055   pos always +0.0455
+  sigma=0.30: pos if seen -0.0353   pos always +0.0132
+  sigma=0.60: pos if seen -0.0583   pos always -0.0329
+  sigma=0.80: pos if seen -0.0679   pos always -0.0429

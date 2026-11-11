@@ -29,15 +29,31 @@ MODEL=opencood/logs/isaacsim_ours_pretrained_hospital_2026_07_27_15_59_42
 OUT=runlogs/estimated_sigma
 HERE=$(dirname "$0")
 
+# Wait for a GPU unused for 5 minutes ONCE, then keep it for the whole batch.
+# Between runs the card is only checked for someone else having moved in during
+# the few seconds it sat empty; only then is a new card looked for.
+GPU=${USE_GPU:-}   # a card the user has already watched sit idle; skips the 5-minute wait
+gpu_for_next_run() {
+    if [ -n "$GPU" ]; then
+        # our own run may take a few seconds to release the card, so look a
+        # few times before concluding someone else took it
+        for _ in 1 2 3 4; do
+            sleep 5
+            if "$HERE/wait_for_gpu.sh" free "$GPU"; then return; fi
+        done
+        echo "    GPU $GPU is now in use by someone else; looking for another"
+    fi
+    echo "=== waiting for a GPU unused for 5 minutes..."
+    GPU=$("$HERE/wait_for_gpu.sh" wait 15 300)
+    echo "    acquired GPU $GPU; the remaining runs stay on it"
+}
+
 for pos in 0.00 0.10 0.20 0.30 0.60 0.80; do
     rot=$(awk -v p="$pos" 'BEGIN{printf "%.1f", p*10}')
     log="$OUT/est_regime_${pos}.log"
 
-    # Never share a card. Idle utilisation does not count as free, so this
-    # blocks until some GPU has no compute process at all.
-    echo "=== est_regime pos_std=$pos  waiting for a free GPU..."
-    GPU=$("$HERE/wait_for_gpu.sh" wait 60)
-    echo "    using GPU $GPU -> $log"
+    gpu_for_next_run
+    echo "--- est_regime pos_std=$pos on GPU $GPU -> $log"
 
     CUDA_VISIBLE_DEVICES="$GPU" $PY -u opencood/tools/inference_isaac.py \
         --model_dir "$MODEL" \

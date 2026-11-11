@@ -68,8 +68,14 @@ everything below z = -0.20 to be floor and discarded most of the body. "The ego
 sees the floor at the partner's position" was not evidence either: a 0.5 m
 circle is larger than the robot, so there is always floor around it.
 
-So when the other robot is inside the wedge, the LiDAR returns something from
-it in 98% of low-overlap views. Direct observation of the partner can be tested
+The "none at all" column comes from a sample covering only the first ten or so
+episodes. Over the whole test split (`mutual_sighting.py`, >= 3 returns on the
+body counts as seen): the ego's LiDAR hits the partner in 52.1% of frames,
+about seven in ten of the 73.9% where it is inside the wedge, which matches the
+30% of lines of sight found blocked above. The partner hits the ego in only
+3.6% (the generator puts the partner ahead of the ego, facing the same way),
+at least one sees the other in 55.2%, and both see each other in 0.6%. Only
+mutual sighting fixes the relative heading as well as the position. Direct observation of the partner can be tested
 on this dataset as it stands. The robot is still not an annotated class.
 
 Sections 1, 3 and 4 are unaffected: they are geometry and arithmetic, and the
