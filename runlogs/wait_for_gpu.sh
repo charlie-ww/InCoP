@@ -1,25 +1,23 @@
 #!/usr/bin/env bash
-# Print the index of a GPU that has been completely unused for a while.
+# Pick a GPU nobody is using.
 #
-# A single look is not enough: a job can sit between two steps with nothing on
-# the card and come back a minute later. So a card only counts as free after it
-# has stayed unused for IDLE seconds without interruption (default 300), sampled
-# every INTERVAL seconds (default 15). Any sign of use resets that card's clock.
+# Rule (the user's): if some card is unused right now, take it immediately. Only
+# when every card is busy, wait - and then a card counts as free once it has
+# stayed unused for IDLE seconds without interruption (default 300), sampled
+# every INTERVAL seconds (default 15), because a card that has just emptied may
+# belong to a job that is between steps. Any sign of use resets that card's
+# clock.
 #
-# "Unused" means all three, because each one catches something the others miss:
+# "Unused" means all three:
 #   - no compute process listed on the card
 #   - almost no memory in use  (catches jobs nvidia-smi cannot list, e.g. in a
 #     container)
 #   - 0% utilisation
 #
-#   wait_for_gpu.sh check                    -> cards unused right now (a snapshot,
-#                                               NOT permission to launch)
-#   wait_for_gpu.sh wait [interval] [idle]   -> blocks, then prints one index
-#   wait_for_gpu.sh free <idx>               -> exit 0 if that card is unused right
-#                                               now. For a batch that already holds
-#                                               the card: the 5-minute wait is paid
-#                                               once, and between runs this only
-#                                               checks nobody else moved in.
+#   wait_for_gpu.sh check                    -> cards unused right now
+#   wait_for_gpu.sh wait [interval] [idle]   -> an unused card now, or wait as above
+#   wait_for_gpu.sh free <idx>               -> exit 0 if that card is unused now
+#                                               (used between runs of a batch)
 set -u
 MEM_LIMIT_MIB=${GPU_FREE_MEM_MIB:-100}
 
@@ -39,7 +37,15 @@ unused_now() {
 }
 
 wait_for_gpu() {
-    local interval=${1:-15} idle=${2:-300} now idx
+    local interval=${1:-15} idle=${2:-300} now idx first
+    # something is free right now: use it, no waiting
+    first=$(unused_now | head -1)
+    if [ -n "$first" ]; then
+        printf '%s\n' "$first"
+        return 0
+    fi
+    # every card was busy: a card must now stay unused for the full idle period
+    echo "all GPUs busy; waiting for one to stay unused for ${idle}s" >&2
     declare -A since=()
     while true; do
         now=$(date +%s)

@@ -2243,6 +2243,14 @@ def test_parser():
                              'in every frame. yaw_always: the complement, heading '
                              'exact and position noisy. clean: the true transform, '
                              'as a check that this hook reproduces zero noise.')
+    parser.add_argument('--direct_obs_blur_seen', type=float, default=None,
+                        help='With --direct_obs: partner blur sigma for samples where '
+                             'the partner robot was seen and its position corrected. '
+                             'Only the heading error is left there, so less blur is '
+                             'expected to be needed.')
+    parser.add_argument('--direct_obs_blur_unseen', type=float, default=None,
+                        help='With --direct_obs: partner blur sigma where it was not '
+                             'seen and the full error remains.')
     parser.add_argument('--direct_obs_min_points', type=int, default=3,
                         help='LiDAR returns on the partner robot needed to count it '
                              'as seen.')
@@ -4132,6 +4140,12 @@ def main():
                     opencood_dataset, i, opt.direct_obs_min_points,
                     direct_obs_log,
                 )
+                if (opt.direct_obs_blur_seen is not None
+                        or opt.direct_obs_blur_unseen is not None):
+                    _seen = bool(direct_obs_log[-1]) if direct_obs_log else False
+                    _sig = (opt.direct_obs_blur_seen if _seen
+                            else opt.direct_obs_blur_unseen)
+                    model.fusion_net.partner_blur_sigma = float(_sig or 0.0)
             setattr(model, "save_feature_debug", save_feature_vis)
             infer_result = inference_isaac_center_head(
                 batch_data, model, hypes["postprocess"], opt.fusion_method

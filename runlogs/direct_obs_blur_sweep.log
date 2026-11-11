@@ -1,0 +1,38 @@
+=== waiting for a GPU unused for 5 minutes...
+    acquired GPU 4; the remaining runs stay on it
+--- sanity_blur_ref.log  on GPU 4
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.3283, mAP@0.5=0.2397, mAP@0.7=0.0323
+--- sanity_blur_hook.log  on GPU 4
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.3283, mAP@0.5=0.2400, mAP@0.7=0.0322
+    direct_obs[clean]: partner robot seen in 100.0% of 200 samples
+SANITY fixed-blur-at-zero=0.3283  hook-blur-clean-under-0.60=0.3283
+SANITY OK
+--- seen1_unseen2_0.10.log  on GPU 4
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.2904, mAP@0.5=0.1751, mAP@0.7=0.0306
+    direct_obs[pos_visible]: partner robot seen in 52.1% of 2440 samples
+--- seen1_unseen2_0.20.log  on GPU 4
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.2691, mAP@0.5=0.1609, mAP@0.7=0.0281
+    direct_obs[pos_visible]: partner robot seen in 52.1% of 2440 samples
+--- seen1_unseen2_0.30.log  on GPU 4
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.2550, mAP@0.5=0.1516, mAP@0.7=0.0273
+    direct_obs[pos_visible]: partner robot seen in 52.1% of 2440 samples
+--- seen1_unseen2_0.60.log  on GPU 4
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.2321, mAP@0.5=0.1386, mAP@0.7=0.0253
+    direct_obs[pos_visible]: partner robot seen in 52.1% of 2440 samples
+--- seen1_unseen2_0.80.log  on GPU 4
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.2279, mAP@0.5=0.1387, mAP@0.7=0.0253
+    direct_obs[pos_visible]: partner robot seen in 52.1% of 2440 samples
+--- seen0_unseen2_0.10.log  on GPU 4
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.3034, mAP@0.5=0.1755, mAP@0.7=0.0314
+    direct_obs[pos_visible]: partner robot seen in 52.1% of 2440 samples
+--- seen2_unseen2_0.10.log  on GPU 4
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.2713, mAP@0.5=0.1634, mAP@0.7=0.0287
+    direct_obs[pos_visible]: partner robot seen in 52.1% of 2440 samples
+--- seen0_unseen2_0.60.log  on GPU 4
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.2036, mAP@0.5=0.1185, mAP@0.7=0.0207
+    direct_obs[pos_visible]: partner robot seen in 52.1% of 2440 samples
+--- seen2_unseen2_0.60.log  on GPU 4
+    exit=0  Isaac multi-class mAP: mAP@0.3=0.2420, mAP@0.5=0.1482, mAP@0.7=0.0270
+    direct_obs[pos_visible]: partner robot seen in 52.1% of 2440 samples
+ALL DONE
+tgnotify: 已送出 Telegram 通知 [成功 (exit 0)] InCoP position fix + blur (2 sanity + 9 runs)

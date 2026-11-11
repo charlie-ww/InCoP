@@ -1,0 +1,350 @@
+Inference split: test, dataset dir: dataset/IsaacSimOPV2V_hospital/test
+Left hand visualizing: True
+Creating Model
+=========Those modules have trainable component=========
+encoder_m1
+fusion_net
+message_backbone
+decoder
+shrink_conv
+center_head
+
+=========Those modules have untrainable component=========
+encoder_m1
+
+Loading Model from checkpoint
+resuming best validation model at epoch 15
+/nfs/home/charlie/InCoP/opencood/tools/train_utils.py:90: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  loaded_state_dict = torch.load(file_list[0] , map_location='cpu')
+------ Loading Checkpoint ------
+resume from 15 epoch.
+Isaac pose noise enabled: pos_std=0.6m, rot_std=6.0deg, pos_mean=0.0m, rot_mean=0.0deg
+Dataset Building
+Dataset dir: dataset/IsaacSimOPV2V_hospital/test
+scenario 0 cav 0 yaml files before filtering: 44
+scenario 0 cav 1 yaml files before filtering: 44
+scenario 1 cav 0 yaml files before filtering: 45
+scenario 1 cav 1 yaml files before filtering: 45
+scenario 2 cav 0 yaml files before filtering: 35
+scenario 2 cav 1 yaml files before filtering: 35
+scenario 3 cav 0 yaml files before filtering: 32
+scenario 3 cav 1 yaml files before filtering: 32
+scenario 4 cav 0 yaml files before filtering: 30
+scenario 4 cav 1 yaml files before filtering: 30
+scenario 5 cav 0 yaml files before filtering: 46
+scenario 5 cav 1 yaml files before filtering: 46
+scenario 6 cav 0 yaml files before filtering: 46
+scenario 6 cav 1 yaml files before filtering: 46
+scenario 7 cav 0 yaml files before filtering: 35
+scenario 7 cav 1 yaml files before filtering: 35
+scenario 8 cav 0 yaml files before filtering: 45
+scenario 8 cav 1 yaml files before filtering: 45
+scenario 9 cav 0 yaml files before filtering: 35
+scenario 9 cav 1 yaml files before filtering: 35
+scenario 10 cav 0 yaml files before filtering: 29
+scenario 10 cav 1 yaml files before filtering: 29
+scenario 11 cav 0 yaml files before filtering: 54
+scenario 11 cav 1 yaml files before filtering: 54
+scenario 12 cav 0 yaml files before filtering: 39
+scenario 12 cav 1 yaml files before filtering: 39
+scenario 13 cav 0 yaml files before filtering: 1
+scenario 13 cav 1 yaml files before filtering: 1
+scenario 14 cav 0 yaml files before filtering: 45
+scenario 14 cav 1 yaml files before filtering: 45
+scenario 15 cav 0 yaml files before filtering: 20
+scenario 15 cav 1 yaml files before filtering: 20
+scenario 16 cav 0 yaml files before filtering: 40
+scenario 16 cav 1 yaml files before filtering: 40
+scenario 17 cav 0 yaml files before filtering: 37
+scenario 17 cav 1 yaml files before filtering: 37
+scenario 18 cav 0 yaml files before filtering: 45
+scenario 18 cav 1 yaml files before filtering: 45
+scenario 19 cav 0 yaml files before filtering: 38
+scenario 19 cav 1 yaml files before filtering: 38
+scenario 20 cav 0 yaml files before filtering: 35
+scenario 20 cav 1 yaml files before filtering: 35
+scenario 21 cav 0 yaml files before filtering: 37
+scenario 21 cav 1 yaml files before filtering: 37
+scenario 22 cav 0 yaml files before filtering: 35
+scenario 22 cav 1 yaml files before filtering: 35
+scenario 23 cav 0 yaml files before filtering: 50
+scenario 23 cav 1 yaml files before filtering: 50
+scenario 24 cav 0 yaml files before filtering: 42
+scenario 24 cav 1 yaml files before filtering: 42
+scenario 25 cav 0 yaml files before filtering: 41
+scenario 25 cav 1 yaml files before filtering: 41
+scenario 26 cav 0 yaml files before filtering: 30
+scenario 26 cav 1 yaml files before filtering: 30
+scenario 27 cav 0 yaml files before filtering: 33
+scenario 27 cav 1 yaml files before filtering: 33
+scenario 28 cav 0 yaml files before filtering: 50
+scenario 28 cav 1 yaml files before filtering: 50
+scenario 29 cav 0 yaml files before filtering: 46
+scenario 29 cav 1 yaml files before filtering: 46
+scenario 30 cav 0 yaml files before filtering: 33
+scenario 30 cav 1 yaml files before filtering: 33
+scenario 31 cav 0 yaml files before filtering: 49
+scenario 31 cav 1 yaml files before filtering: 49
+scenario 32 cav 0 yaml files before filtering: 35
+scenario 32 cav 1 yaml files before filtering: 35
+scenario 33 cav 0 yaml files before filtering: 29
+scenario 33 cav 1 yaml files before filtering: 29
+scenario 34 cav 0 yaml files before filtering: 35
+scenario 34 cav 1 yaml files before filtering: 35
+scenario 35 cav 0 yaml files before filtering: 42
+scenario 35 cav 1 yaml files before filtering: 42
+scenario 36 cav 0 yaml files before filtering: 58
+scenario 36 cav 1 yaml files before filtering: 58
+scenario 37 cav 0 yaml files before filtering: 33
+scenario 37 cav 1 yaml files before filtering: 33
+scenario 38 cav 0 yaml files before filtering: 43
+scenario 38 cav 1 yaml files before filtering: 43
+scenario 39 cav 0 yaml files before filtering: 57
+scenario 39 cav 1 yaml files before filtering: 57
+scenario 40 cav 0 yaml files before filtering: 22
+scenario 40 cav 1 yaml files before filtering: 22
+scenario 41 cav 0 yaml files before filtering: 32
+scenario 41 cav 1 yaml files before filtering: 32
+scenario 42 cav 0 yaml files before filtering: 39
+scenario 42 cav 1 yaml files before filtering: 39
+scenario 43 cav 0 yaml files before filtering: 50
+scenario 43 cav 1 yaml files before filtering: 50
+scenario 44 cav 0 yaml files before filtering: 39
+scenario 44 cav 1 yaml files before filtering: 39
+scenario 45 cav 0 yaml files before filtering: 35
+scenario 45 cav 1 yaml files before filtering: 35
+scenario 46 cav 0 yaml files before filtering: 62
+scenario 46 cav 1 yaml files before filtering: 62
+scenario 47 cav 0 yaml files before filtering: 38
+scenario 47 cav 1 yaml files before filtering: 38
+scenario 48 cav 0 yaml files before filtering: 2
+scenario 48 cav 1 yaml files before filtering: 2
+scenario 49 cav 0 yaml files before filtering: 54
+scenario 49 cav 1 yaml files before filtering: 54
+scenario 50 cav 0 yaml files before filtering: 53
+scenario 50 cav 1 yaml files before filtering: 53
+scenario 51 cav 0 yaml files before filtering: 1
+scenario 51 cav 1 yaml files before filtering: 1
+scenario 52 cav 0 yaml files before filtering: 42
+scenario 52 cav 1 yaml files before filtering: 42
+scenario 53 cav 0 yaml files before filtering: 25
+scenario 53 cav 1 yaml files before filtering: 25
+scenario 54 cav 0 yaml files before filtering: 27
+scenario 54 cav 1 yaml files before filtering: 27
+scenario 55 cav 0 yaml files before filtering: 39
+scenario 55 cav 1 yaml files before filtering: 39
+scenario 56 cav 0 yaml files before filtering: 32
+scenario 56 cav 1 yaml files before filtering: 32
+scenario 57 cav 0 yaml files before filtering: 24
+scenario 57 cav 1 yaml files before filtering: 24
+scenario 58 cav 0 yaml files before filtering: 26
+scenario 58 cav 1 yaml files before filtering: 26
+scenario 59 cav 0 yaml files before filtering: 56
+scenario 59 cav 1 yaml files before filtering: 56
+scenario 60 cav 0 yaml files before filtering: 39
+scenario 60 cav 1 yaml files before filtering: 39
+scenario 61 cav 0 yaml files before filtering: 36
+scenario 61 cav 1 yaml files before filtering: 36
+scenario 62 cav 0 yaml files before filtering: 21
+scenario 62 cav 1 yaml files before filtering: 21
+scenario 63 cav 0 yaml files before filtering: 58
+scenario 63 cav 1 yaml files before filtering: 58
+scenario 64 cav 0 yaml files before filtering: 34
+scenario 64 cav 1 yaml files before filtering: 34
+len: 2440
+scenario 0 cav 0 yaml files before filtering: 44
+scenario 0 cav 1 yaml files before filtering: 44
+scenario 1 cav 0 yaml files before filtering: 45
+scenario 1 cav 1 yaml files before filtering: 45
+scenario 2 cav 0 yaml files before filtering: 35
+scenario 2 cav 1 yaml files before filtering: 35
+scenario 3 cav 0 yaml files before filtering: 32
+scenario 3 cav 1 yaml files before filtering: 32
+scenario 4 cav 0 yaml files before filtering: 30
+scenario 4 cav 1 yaml files before filtering: 30
+scenario 5 cav 0 yaml files before filtering: 46
+scenario 5 cav 1 yaml files before filtering: 46
+scenario 6 cav 0 yaml files before filtering: 46
+scenario 6 cav 1 yaml files before filtering: 46
+scenario 7 cav 0 yaml files before filtering: 35
+scenario 7 cav 1 yaml files before filtering: 35
+scenario 8 cav 0 yaml files before filtering: 45
+scenario 8 cav 1 yaml files before filtering: 45
+scenario 9 cav 0 yaml files before filtering: 35
+scenario 9 cav 1 yaml files before filtering: 35
+scenario 10 cav 0 yaml files before filtering: 29
+scenario 10 cav 1 yaml files before filtering: 29
+scenario 11 cav 0 yaml files before filtering: 54
+scenario 11 cav 1 yaml files before filtering: 54
+scenario 12 cav 0 yaml files before filtering: 39
+scenario 12 cav 1 yaml files before filtering: 39
+scenario 13 cav 0 yaml files before filtering: 1
+scenario 13 cav 1 yaml files before filtering: 1
+scenario 14 cav 0 yaml files before filtering: 45
+scenario 14 cav 1 yaml files before filtering: 45
+scenario 15 cav 0 yaml files before filtering: 20
+scenario 15 cav 1 yaml files before filtering: 20
+scenario 16 cav 0 yaml files before filtering: 40
+scenario 16 cav 1 yaml files before filtering: 40
+scenario 17 cav 0 yaml files before filtering: 37
+scenario 17 cav 1 yaml files before filtering: 37
+scenario 18 cav 0 yaml files before filtering: 45
+scenario 18 cav 1 yaml files before filtering: 45
+scenario 19 cav 0 yaml files before filtering: 38
+scenario 19 cav 1 yaml files before filtering: 38
+scenario 20 cav 0 yaml files before filtering: 35
+scenario 20 cav 1 yaml files before filtering: 35
+scenario 21 cav 0 yaml files before filtering: 37
+scenario 21 cav 1 yaml files before filtering: 37
+scenario 22 cav 0 yaml files before filtering: 35
+scenario 22 cav 1 yaml files before filtering: 35
+scenario 23 cav 0 yaml files before filtering: 50
+scenario 23 cav 1 yaml files before filtering: 50
+scenario 24 cav 0 yaml files before filtering: 42
+scenario 24 cav 1 yaml files before filtering: 42
+scenario 25 cav 0 yaml files before filtering: 41
+scenario 25 cav 1 yaml files before filtering: 41
+scenario 26 cav 0 yaml files before filtering: 30
+scenario 26 cav 1 yaml files before filtering: 30
+scenario 27 cav 0 yaml files before filtering: 33
+scenario 27 cav 1 yaml files before filtering: 33
+scenario 28 cav 0 yaml files before filtering: 50
+scenario 28 cav 1 yaml files before filtering: 50
+scenario 29 cav 0 yaml files before filtering: 46
+scenario 29 cav 1 yaml files before filtering: 46
+scenario 30 cav 0 yaml files before filtering: 33
+scenario 30 cav 1 yaml files before filtering: 33
+scenario 31 cav 0 yaml files before filtering: 49
+scenario 31 cav 1 yaml files before filtering: 49
+scenario 32 cav 0 yaml files before filtering: 35
+scenario 32 cav 1 yaml files before filtering: 35
+scenario 33 cav 0 yaml files before filtering: 29
+scenario 33 cav 1 yaml files before filtering: 29
+scenario 34 cav 0 yaml files before filtering: 35
+scenario 34 cav 1 yaml files before filtering: 35
+scenario 35 cav 0 yaml files before filtering: 42
+scenario 35 cav 1 yaml files before filtering: 42
+scenario 36 cav 0 yaml files before filtering: 58
+scenario 36 cav 1 yaml files before filtering: 58
+scenario 37 cav 0 yaml files before filtering: 33
+scenario 37 cav 1 yaml files before filtering: 33
+scenario 38 cav 0 yaml files before filtering: 43
+scenario 38 cav 1 yaml files before filtering: 43
+scenario 39 cav 0 yaml files before filtering: 57
+scenario 39 cav 1 yaml files before filtering: 57
+scenario 40 cav 0 yaml files before filtering: 22
+scenario 40 cav 1 yaml files before filtering: 22
+scenario 41 cav 0 yaml files before filtering: 32
+scenario 41 cav 1 yaml files before filtering: 32
+scenario 42 cav 0 yaml files before filtering: 39
+scenario 42 cav 1 yaml files before filtering: 39
+scenario 43 cav 0 yaml files before filtering: 50
+scenario 43 cav 1 yaml files before filtering: 50
+scenario 44 cav 0 yaml files before filtering: 39
+scenario 44 cav 1 yaml files before filtering: 39
+scenario 45 cav 0 yaml files before filtering: 35
+scenario 45 cav 1 yaml files before filtering: 35
+scenario 46 cav 0 yaml files before filtering: 62
+scenario 46 cav 1 yaml files before filtering: 62
+scenario 47 cav 0 yaml files before filtering: 38
+scenario 47 cav 1 yaml files before filtering: 38
+scenario 48 cav 0 yaml files before filtering: 2
+scenario 48 cav 1 yaml files before filtering: 2
+scenario 49 cav 0 yaml files before filtering: 54
+scenario 49 cav 1 yaml files before filtering: 54
+scenario 50 cav 0 yaml files before filtering: 53
+scenario 50 cav 1 yaml files before filtering: 53
+scenario 51 cav 0 yaml files before filtering: 1
+scenario 51 cav 1 yaml files before filtering: 1
+scenario 52 cav 0 yaml files before filtering: 42
+scenario 52 cav 1 yaml files before filtering: 42
+scenario 53 cav 0 yaml files before filtering: 25
+scenario 53 cav 1 yaml files before filtering: 25
+scenario 54 cav 0 yaml files before filtering: 27
+scenario 54 cav 1 yaml files before filtering: 27
+scenario 55 cav 0 yaml files before filtering: 39
+scenario 55 cav 1 yaml files before filtering: 39
+scenario 56 cav 0 yaml files before filtering: 32
+scenario 56 cav 1 yaml files before filtering: 32
+scenario 57 cav 0 yaml files before filtering: 24
+scenario 57 cav 1 yaml files before filtering: 24
+scenario 58 cav 0 yaml files before filtering: 26
+scenario 58 cav 1 yaml files before filtering: 26
+scenario 59 cav 0 yaml files before filtering: 56
+scenario 59 cav 1 yaml files before filtering: 56
+scenario 60 cav 0 yaml files before filtering: 39
+scenario 60 cav 1 yaml files before filtering: 39
+scenario 61 cav 0 yaml files before filtering: 36
+scenario 61 cav 1 yaml files before filtering: 36
+scenario 62 cav 0 yaml files before filtering: 21
+scenario 62 cav 1 yaml files before filtering: 21
+scenario 63 cav 0 yaml files before filtering: 58
+scenario 63 cav 1 yaml files before filtering: 58
+scenario 64 cav 0 yaml files before filtering: 34
+scenario 64 cav 1 yaml files before filtering: 34
+len: 2440
+Isaac fixed-ego inference enabled: robot 0 is ego, robot 1 is collaborative.
+Isaac BEV/debug range: [0.0, -11.2, -1, 22.4, 11.2, 3]
+BEV visualization: interval=200
+Feature visualization: follows --save_vis_interval, method=channel_l2, cmap=viridis, includes ego/co/raw/overlay and proposed-module internals under module_features/
+intermediate_epoch15_noise_t0p6_r6_score0p25_nms0p15_global_sort_0
+/nfs/home/charlie/miniconda3/envs/InCoP/lib/python3.8/site-packages/shapely/set_operations.py:133: RuntimeWarning: invalid value encountered in intersection
+  return lib.intersection(a, b, **kwargs)
+opencood/tools/inference_isaac.py:207: MatplotlibDeprecationWarning: The get_cmap function was deprecated in Matplotlib 3.7 and will be removed two minor releases later. Use ``matplotlib.colormaps[name]`` or ``matplotlib.colormaps.get_cmap(obj)`` instead.
+  rgba = cm.get_cmap("viridis")(fmap)
+intermediate_epoch15_noise_t0p6_r6_score0p25_nms0p15_global_sort_50
+intermediate_epoch15_noise_t0p6_r6_score0p25_nms0p15_global_sort_100
+intermediate_epoch15_noise_t0p6_r6_score0p25_nms0p15_global_sort_150
+intermediate_epoch15_noise_t0p6_r6_score0p25_nms0p15_global_sort_200
+intermediate_epoch15_noise_t0p6_r6_score0p25_nms0p15_global_sort_250
+intermediate_epoch15_noise_t0p6_r6_score0p25_nms0p15_global_sort_300
+intermediate_epoch15_noise_t0p6_r6_score0p25_nms0p15_global_sort_350
+intermediate_epoch15_noise_t0p6_r6_score0p25_nms0p15_global_sort_400
+intermediate_epoch15_noise_t0p6_r6_score0p25_nms0p15_global_sort_450
+intermediate_epoch15_noise_t0p6_r6_score0p25_nms0p15_global_sort_500
+intermediate_epoch15_noise_t0p6_r6_score0p25_nms0p15_global_sort_550
+intermediate_epoch15_noise_t0p6_r6_score0p25_nms0p15_global_sort_600
+intermediate_epoch15_noise_t0p6_r6_score0p25_nms0p15_global_sort_650
+intermediate_epoch15_noise_t0p6_r6_score0p25_nms0p15_global_sort_700
+intermediate_epoch15_noise_t0p6_r6_score0p25_nms0p15_global_sort_750
+intermediate_epoch15_noise_t0p6_r6_score0p25_nms0p15_global_sort_800
+intermediate_epoch15_noise_t0p6_r6_score0p25_nms0p15_global_sort_850
+intermediate_epoch15_noise_t0p6_r6_score0p25_nms0p15_global_sort_900
+intermediate_epoch15_noise_t0p6_r6_score0p25_nms0p15_global_sort_950
+intermediate_epoch15_noise_t0p6_r6_score0p25_nms0p15_global_sort_1000
+intermediate_epoch15_noise_t0p6_r6_score0p25_nms0p15_global_sort_1050
+intermediate_epoch15_noise_t0p6_r6_score0p25_nms0p15_global_sort_1100
+intermediate_epoch15_noise_t0p6_r6_score0p25_nms0p15_global_sort_1150
+intermediate_epoch15_noise_t0p6_r6_score0p25_nms0p15_global_sort_1200
+intermediate_epoch15_noise_t0p6_r6_score0p25_nms0p15_global_sort_1250
+intermediate_epoch15_noise_t0p6_r6_score0p25_nms0p15_global_sort_1300
+intermediate_epoch15_noise_t0p6_r6_score0p25_nms0p15_global_sort_1350
+intermediate_epoch15_noise_t0p6_r6_score0p25_nms0p15_global_sort_1400
+intermediate_epoch15_noise_t0p6_r6_score0p25_nms0p15_global_sort_1450
+intermediate_epoch15_noise_t0p6_r6_score0p25_nms0p15_global_sort_1500
+intermediate_epoch15_noise_t0p6_r6_score0p25_nms0p15_global_sort_1550
+intermediate_epoch15_noise_t0p6_r6_score0p25_nms0p15_global_sort_1600
+intermediate_epoch15_noise_t0p6_r6_score0p25_nms0p15_global_sort_1650
+intermediate_epoch15_noise_t0p6_r6_score0p25_nms0p15_global_sort_1700
+intermediate_epoch15_noise_t0p6_r6_score0p25_nms0p15_global_sort_1750
+intermediate_epoch15_noise_t0p6_r6_score0p25_nms0p15_global_sort_1800
+intermediate_epoch15_noise_t0p6_r6_score0p25_nms0p15_global_sort_1850
+intermediate_epoch15_noise_t0p6_r6_score0p25_nms0p15_global_sort_1900
+intermediate_epoch15_noise_t0p6_r6_score0p25_nms0p15_global_sort_1950
+intermediate_epoch15_noise_t0p6_r6_score0p25_nms0p15_global_sort_2000
+intermediate_epoch15_noise_t0p6_r6_score0p25_nms0p15_global_sort_2050
+intermediate_epoch15_noise_t0p6_r6_score0p25_nms0p15_global_sort_2100
+intermediate_epoch15_noise_t0p6_r6_score0p25_nms0p15_global_sort_2150
+intermediate_epoch15_noise_t0p6_r6_score0p25_nms0p15_global_sort_2200
+intermediate_epoch15_noise_t0p6_r6_score0p25_nms0p15_global_sort_2250
+intermediate_epoch15_noise_t0p6_r6_score0p25_nms0p15_global_sort_2300
+intermediate_epoch15_noise_t0p6_r6_score0p25_nms0p15_global_sort_2350
+intermediate_epoch15_noise_t0p6_r6_score0p25_nms0p15_global_sort_2400
+direct_obs[pos_visible]: partner robot seen in 52.1% of 2440 samples
+Isaac multi-class mAP: mAP@0.3=0.2036, mAP@0.5=0.1185, mAP@0.7=0.0207
+False-positive summary: FPPI@0.5=3.423, Precision@0.5=0.337
+Indoor class-wise localization: mATE@0.5m=0.1349378994532994, mASE@0.5m=0.10138726261045251
+Isaac distance case mAP: mAP@0.3=0.2209, mAP@0.5=0.1232, mAP@0.7=0.0184
+Isaac occlusion case mAP: mAP@0.3=0.1861, mAP@0.5=0.1181, mAP@0.7=0.0267
+Saved unified Isaac evaluation summary to opencood/logs/isaacsim_ours_pretrained_hospital_2026_07_27_15_59_42/eval_all_isaac_intermediate_epoch15_noise_t0p6_r6_score0p25_nms0p15_global_sort.yaml
+Communication: 170.741 KB/sample (0.170741 MB/sample), total 416.607 MB

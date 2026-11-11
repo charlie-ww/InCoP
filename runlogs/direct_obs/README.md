@@ -75,3 +75,44 @@ Share of the pose-error loss recovered:
 - No blur on top. "Fix position where seen, blur the rest" is the obvious
   combination and was not run.
 - Oracle position, not a detector.
+
+## Fix the position where seen, then blur (direct_obs_blur_sweep.sh)
+
+Added 2026-11-12. Same upper bound for the position, plus the hedge the first
+sweep lacked: frames where the partner is seen get blur sigma S for the heading
+error left over; frames where it is not seen get the best constant blur
+(sigma 2). Sanity first: the per-sample blur hook under sigma_pos 0.60 with the
+true transform and blur 2 gave 0.3283, identical to a plain fixed blur of 2 at
+zero noise on the same 200 samples.
+
+mAP@0.3:
+
+| sigma_pos | best blur alone | position where seen, no blur | + blur S=0 | + blur S=1 | + blur S=2 |
+|---|---|---|---|---|---|
+| 0.10 | 0.2810 | **0.3120** | 0.3034 | 0.2904 | 0.2713 |
+| 0.20 | 0.2506 | 0.2451 | - | **0.2691** | - |
+| 0.30 | 0.2407 | 0.2054 | - | **0.2550** | - |
+| 0.60 | 0.2309 | 0.1726 | 0.2036 | 0.2321 | **0.2420** |
+| 0.80 | **0.2307** | 0.1628 | - | 0.2279 | - |
+
+"+ blur S" means sigma S where seen and sigma 2 where not; "position where seen,
+no blur" is pos_visible from the first sweep (no blur anywhere).
+
+1. **The combination beats blur alone from 0.10 to 0.60**, by +0.031 (no blur
+   at all), +0.019, +0.014 and +0.011. At 0.80 the one setting tried (S=1) is
+   0.003 below; S=2 was not run there.
+2. **The right amount of blur grows with the error.** At 0.10 any blur hurts,
+   even on unseen frames (0.3120 with none against 0.3034 with sigma 2 on
+   unseen frames). At 0.60 the most blur tried is best (S=2, 0.2420). This is
+   the same pattern as the blur sweep without correction, where the best
+   constant went from none to sigma 2 as the noise grew - so the blur strength
+   should be set by the estimated noise regime, which the regime selector
+   already estimates.
+3. Over the five levels, the best tried setting per level averages 0.2612,
+   against 0.2468 for the best blur per level and 0.2485 for the per-frame blur
+   oracle: correcting where possible and hedging the rest beats any amount of
+   cleverness about the blur alone.
+
+Caveats: the position is oracle; S was picked on the test split, so the best
+per level is a hindsight upper bound; S = 0 and S = 2 were run only at 0.10 and
+0.60.
