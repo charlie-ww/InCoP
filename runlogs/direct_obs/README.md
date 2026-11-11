@@ -47,12 +47,18 @@ Share of the pose-error loss recovered:
    even "position always" is below it from 0.60. The leftover heading error is
    enough to break small objects (the heading budget is about 1.15 deg at 8 m)
    and nothing hedges it here.
-3. **Position is the larger part of the damage, which corrects an earlier
-   claim.** Fixing heading alone recovers 8.1% at 0.20 and 0.9% at 0.60, against
-   50.4% and 21.3% for position. The earlier statement "position is not what
-   breaks us" was wrong for this benchmark's noise. The accurate one: each
-   component alone exceeds the tolerance, so fixing either one leaves most of
-   the loss, and position is the bigger share.
+3. **What the split separates is "where the partner is" from "which way its
+   map is turned" - not translation noise from rotation noise.** Fixing the
+   partner's position recovers 50.4% at 0.20; fixing only the relative heading
+   recovers 8.1%. That does NOT mean rotation noise is minor. Noise is on both
+   robots, and the ego's own heading error swings the partner's believed
+   position around the ego (2 deg at 8 m is 0.28 m). That part lands in the
+   position column, so seeing the partner removes it and "heading fixed" does
+   not. Independent check from `figures/make_overlap_ratio_figure.py`: cutting
+   the rotation noise from 10x to 1x the translation noise recovers 33% of the
+   loss at 0.10 and 19% at 0.20 - more than "heading fixed" (8.1%). Corrected
+   2026-11-12; the first version of this README said position error was the
+   larger share, which mixed the two.
 4. **The benefit scales with how often the robot is seen.** "Where seen"
    recovers 45-53% of what "always" does, close to the 52.1% of frames in which
    it is seen. The frames with sightings are about average, not easy ones.
