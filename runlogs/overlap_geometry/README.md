@@ -29,11 +29,19 @@ what the evaluation scores.
 | frames with zero shared objects | 26.0 % | 1.1 % |
 | frames with <= 2 shared objects | 53.3 % | 10.9 % |
 
-**The high-overlap split is a 1 m stereo baseline, not two robots in different
-places.** The partner sits ~0.9-1.0 m to the side of the ego with a heading
-difference of exactly 0.00 deg. It is usable as the "redundant partner"
-endpoint and should be labelled as such; it does not make overlap a continuous
-variable.
+**The high-overlap split is the same path with the same heading, shifted
+1-2.5 m - not two robots in different places.** It is usable as the "redundant
+partner" endpoint and should be labelled as such; it does not make overlap a
+continuous variable.
+
+*Corrected 2026-11-11.* This section first called it "a 1 m stereo baseline,
+partner ~0.9-1.0 m to the side". That came from the test split alone (one
+scene, hospital). Across train, validate and test the headings do match
+(median difference 0.01-0.08 deg, max 5.3) but the shift is 1.0-2.5 m in
+varying directions, with a front-back component up to 0.91 m median in the
+warehouse scene, so one robot often appears in the other's camera. See
+`runlogs/highoverlap/geometry_all_splits.log`. The table above is still the
+test split.
 
 Note the coverage trade-off: the high-overlap split sees 43% fewer distinct
 objects (19953 -> 11376), because two robots standing together see the same
