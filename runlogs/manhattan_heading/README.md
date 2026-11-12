@@ -80,12 +80,21 @@ frames only.
 | 10 | 0.56 | 40.2% | 66.8% | 79.7% | 5.3% |
 | 20 | 0.48 | 44.8% | **76.5%** | 89.6% | **0.6%** |
 
-And the disagreement inside the window is an uncertainty: at k = 10 its
-Spearman with the error is **+0.636** on hospital (+0.666 on
-warehouse/office). A 90% range calibrated per spread tercile on
-warehouse/office has half-widths 0.69 / 1.27 / 4.62 deg and covers 87.4% on
-hospital (89.3 / 86.6 / 87.1% per tercile), mean half-width 2.72 deg. The 90%
-range of the injected noise itself is 2.33 deg at sigma 0.1 and 4.65 deg at 0.2.
+Frames with zero shared objects do as well at k = 20: 75.5% within 1.15 deg,
+1.3% above 5 deg.
+
+And the disagreement inside the window is an uncertainty (median distance of
+the window's readings from their median, worse of the two robots):
+
+| k | Spearman with error, hospital | warehouse/office | 90% half-widths by spread tercile | hospital coverage | mean half-width |
+|---|---|---|---|---|---|
+| 10 | +0.636 | +0.666 | 0.69 / 1.27 / 4.62 deg | 87.4% | 2.72 deg |
+| 20 | **+0.612** | +0.659 | **0.55 / 1.00 / 2.53 deg** | **87.2%** | **1.60 deg** |
+
+Ranges are calibrated on warehouse/office and graded on hospital (per tercile at
+k = 20: 84.4 / 90.5 / 86.5%; zero shared objects 86.3%). The 90% range of the
+injected noise itself is 2.33 deg at sigma 0.1 and 4.65 deg at 0.2. The slides
+and the report quote k = 20.
 
 Rejecting a wall reading that disagrees with the reported heading by more than
 3 noise std adds a little at sigma 0.1 (66.8% -> 70.8% within 1.15 deg at k = 10)

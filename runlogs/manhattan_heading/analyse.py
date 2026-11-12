@@ -133,7 +133,7 @@ pooled_by_k = {}
 for k in (1, 5, 10, 20):
     tt = pooled(test, k); pooled_by_k[k] = tt
     print(f"| k={k:2d} hospital " + row(tt.e_pool) + " |")
-for k in (10,):
+for k in (10, 20):
     tt = pooled_by_k[k]
     for lab_, lo, hi in (("0 co-visible", 0, 0), (">=1", 1, 999)):
         g = tt[(tt.covis >= lo) & (tt.covis <= hi)]
