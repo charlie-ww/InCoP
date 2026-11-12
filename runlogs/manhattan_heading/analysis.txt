@@ -1,0 +1,83 @@
+## 1. Is the building axis-aligned? world angle of the walls, per scene
+  full_warehouse_v1  axis  89.97 deg (mod 90); single robot vs axis: median 0.21, <1.15 89.1%, >5 0.8%
+  hospital_v1        axis  89.95 deg (mod 90); single robot vs axis: median 0.38, <1.15 76.3%, >5 4.5%
+  office_v1          axis  90.00 deg (mod 90); single robot vs axis: median 0.42, <1.15 76.2%, >5 4.4%
+
+## 2. Relative heading from the walls alone vs truth
+| n | median deg | <0.41 deg | <1.15 deg | <2 deg | >5 deg |
+| test     hospital_v1          2440 |  0.71 |  33.5% |  62.3% |  76.6% |   8.8% |
+| train    full_warehouse_v1    3630 |  0.38 |  52.3% |  78.8% |  88.5% |   1.5% |
+| train    office_v1            3221 |  0.84 |  31.4% |  59.7% |  74.4% |   8.0% |
+| validate full_warehouse_v1    1232 |  0.45 |  46.7% |  77.4% |  87.3% |   1.5% |
+| validate office_v1             708 |  0.85 |  31.9% |  55.9% |  71.5% |  10.2% |
+
+## 3. Hospital test, by objects both robots see in this frame
+| co-visible  n | median deg | <0.41 deg | <1.15 deg | <2 deg | >5 deg |
+| 0    |    620 |  0.84 |  29.2% |  56.8% |  72.6% |  11.5% |
+| 1-2  |    525 |  0.70 |  34.9% |  59.2% |  72.2% |   9.3% |
+| 3-5  |    728 |  0.69 |  34.5% |  63.2% |  75.5% |  11.0% |
+| >=6  |    567 |  0.61 |  35.8% |  70.2% |  86.2% |   2.5% |
+| by distance between robots:
+|  0- 4 m |     25 |  3.18 |   8.0% |  20.0% |  32.0% |  40.0% |
+|  4- 8 m |   1171 |  0.63 |  34.9% |  67.2% |  80.2% |   7.3% |
+|  8-12 m |    631 |  0.79 |  32.2% |  60.5% |  79.6% |   5.2% |
+| 12-99 m |    613 |  0.83 |  33.3% |  56.6% |  68.4% |  14.0% |
+
+## 4. Does the scan know when it is wrong?
+  Spearman(conf, |error|) on tune: -0.202
+  Spearman(conf, |error|) on test: -0.161
+  Spearman(struct, |error|) on tune: -0.082
+  Spearman(struct, |error|) on test: -0.120
+  confidence terciles cut on warehouse/office at 1.437, 1.812
+| confidence | split  n | median deg | <0.41 deg | <1.15 deg | <2 deg | >5 deg |
+| low  | tune |   2930 |  0.73 |  34.2% |  61.5% |  74.8% |   8.0% |
+| low  | test |    715 |  1.02 |  25.5% |  52.7% |  67.8% |  14.0% |
+| mid  | tune |   2930 |  0.57 |  40.9% |  69.0% |  82.2% |   4.2% |
+| mid  | test |   1012 |  0.66 |  35.1% |  66.2% |  80.0% |   6.6% |
+| high | tune |   2931 |  0.39 |  51.6% |  78.7% |  88.4% |   1.7% |
+| high | test |    713 |  0.55 |  39.4% |  66.5% |  80.4% |   6.6% |
+
+## 5. Calibrated 90% heading range per confidence tercile (calibrated on warehouse/office)
+  half-widths: low 4.32, mid 3.05, high 2.22 deg
+  hospital coverage 84.7%, mean half-width 3.18 deg
+    low : coverage  84.6%  (715 frames)
+    mid : coverage  86.8%  (1012 frames)
+    high: coverage  81.8%  (713 frames)
+    0 co-visible: coverage  82.1%, mean half-width 3.33
+    >=1 co-visible: coverage  85.5%, mean half-width 3.13
+  for comparison, the 90% range of the injected relative heading noise (1.645 x sqrt2 x 10 sigma):
+    sigma 0.1: 2.33, sigma 0.2: 4.65, sigma 0.3: 6.98, sigma 0.6: 13.96, sigma 0.8: 18.61
+
+## 6. Replacing the reported relative heading (simulated noise, 20 draws per frame)
+  confidence gate chosen on warehouse/office: use the walls when conf >= 1.000 (100.0% of hospital frames)
+| sigma | relative-heading noise std | within 1.15 deg: reported | walls always | walls if confident | median deg: reported | walls always | ambiguity wrong |
+| 0.1 |  1.41 |  58.4% |  62.3% |  62.3% |  0.96 |  0.71 | 0.000% |
+| 0.2 |  2.83 |  31.6% |  62.3% |  62.3% |  1.90 |  0.71 | 0.000% |
+| 0.3 |  4.24 |  21.7% |  62.3% |  62.3% |  2.84 |  0.71 | 0.000% |
+| 0.6 |  8.49 |  10.8% |  62.3% |  62.3% |  5.73 |  0.71 | 0.002% |
+| 0.8 | 11.31 |   8.3% |  62.3% |  62.3% |  7.62 |  0.71 | 0.012% |
+
+## 7. Pooling each robot's wall angle over its own past frames
+  Assumes the robot knows how much it has itself turned since k frames ago (gyro /
+  odometry is accurate over ~1.6 m); taken here from the true yaw increments.
+  Window = the current frame and the k-1 before it, in order, within the episode.
+| n | median deg | <0.41 deg | <1.15 deg | <2 deg | >5 deg |
+| k= 1 hospital   2440 |  0.71 |  33.5% |  62.3% |  76.6% |   8.8% |
+| k= 5 hospital   2440 |  0.65 |  37.0% |  64.1% |  77.5% |   7.9% |
+| k=10 hospital   2440 |  0.56 |  40.2% |  66.8% |  79.7% |   5.3% |
+| k=20 hospital   2440 |  0.48 |  44.8% |  76.5% |  89.6% |   0.6% |
+| k=10 0 co-visible    620 |  0.64 |  37.6% |  62.6% |  76.5% |   8.1% |
+| k=10 >=1   1820 |  0.53 |  41.2% |  68.2% |  80.8% |   4.3% |
+  k=10: Spearman(window spread, |error|) on hospital = +0.636
+  k=10: Spearman(window spread, |error|) on warehouse/office = +0.666
+  calibrated 90% half-widths by spread tercile (warehouse/office): 0.69 / 1.27 / 4.62 deg
+  hospital coverage 87.4%, mean half-width 2.72 deg; by tercile 89.3%, 86.6%, 87.1%
+
+## 8. Reject wall readings that disagree with the reported heading by > 3 noise std
+  (needs the noise level, which the regime detector estimates; true level used here)
+| sigma | within 1.15 deg: reported | walls k=1 gated | walls k=10 | walls k=10 gated | median: k=10 gated |
+| 0.1 |  58.4% |  68.3% |  66.8% |  70.8% | 0.53 |
+| 0.2 |  31.4% |  63.0% |  66.8% |  66.8% | 0.56 |
+| 0.3 |  21.3% |  62.3% |  66.8% |  66.6% | 0.56 |
+| 0.6 |  10.7% |  62.2% |  66.8% |  66.6% | 0.56 |
+| 0.8 |   8.0% |  62.2% |  66.8% |  66.6% | 0.56 |
